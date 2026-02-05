@@ -250,5 +250,13 @@
       rev = "50c7b71a6a224734cc9b21963c6d1926816a97f1";
       hash = "sha256-+qYmGdHjrWYfJ+uqGURWk1y8kVR0pBc+ObjUyM0A7UA=";
     };
+
+  comfyui-custom-scripts = {
+      version = "2026-02-05";
+      owner = "pythongosssss";
+      repo = "ComfyUI-Custom-Scripts";
+      rev = "f2838ed5e59de4d73cde5c98354b87a8d3200190";
+      hash = "sha256-0DgPrOFXOjQ4K1RKxLQdtGfJHbopP8iovoJqna8d+Gg=";
+    };
   };
 }

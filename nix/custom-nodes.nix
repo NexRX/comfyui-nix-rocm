@@ -588,6 +588,40 @@ let
     };
   };
 
+  # ComfyUI-Custom-Scripts
+  comfyui-custom-scripts = pkgs.stdenv.mkDerivation {
+    pname = "comfyui-custom-scripts";
+    version = versions.customNodes.comfyui-custom-scripts.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.comfyui-custom-scripts.owner;
+      repo = versions.customNodes.comfyui-custom-scripts.repo;
+      rev = versions.customNodes.comfyui-custom-scripts.rev;
+      hash = versions.customNodes.comfyui-custom-scripts.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    # Python dependencies required by ComfyUI-Lora-Manager
+    passthru.pythonDeps =
+      ps: with ps; [
+      ];
+
+    meta = with lib; {
+      description = "ComfyUI-Custom-Scripts / PlaySound|pysssss - Enhancements & experiments for ComfyUI, mostly focusing on UI features";
+      homepage = "https://github.com/pythongosssss/ComfyUI-Custom-Scripts";
+      license = licenses.gpl3;
+    };
+  };
+
 in
 {
   inherit
@@ -605,5 +639,6 @@ in
     comfyui-easy-use
     comfyui-lora-manager
     comfyui-impact-subpack
+    comfyui-custom-scripts
     ;
 }

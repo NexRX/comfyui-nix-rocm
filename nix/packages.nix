@@ -477,6 +477,10 @@ let
             if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI-Impact-Subpack" ]]; then
               ln -sf "${customNodes.comfyui-impact-subpack}" "$BASE_DIR/custom_nodes/ComfyUI-Impact-Subpack"
             fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI-Custom-Scripts" ]]; then
+              cp -r "${customNodes.comfyui-custom-scripts}" "$BASE_DIR/custom_nodes/ComfyUI-Custom-Scripts"
+              chmod -R 777 "$BASE_DIR/custom_nodes/ComfyUI-Custom-Scripts"
+            fi
 
             # Create default ComfyUI-Manager config if it doesn't exist
             # Note: Manager moved config from user/default/ComfyUI-Manager to user/__manager
