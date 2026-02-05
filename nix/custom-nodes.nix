@@ -461,7 +461,7 @@ let
   # comfyui-easy-use
   comfyui-easy-use = pkgs.stdenv.mkDerivation {
     pname = "comfyui-easy-use";
-    version = versions.customNodes.kjnodes.version;
+    version = versions.customNodes.comfyui-easy-use.version;
 
     src = pkgs.fetchFromGitHub {
       owner = versions.customNodes.comfyui-easy-use.owner;
@@ -494,6 +494,42 @@ let
     };
   };
 
+  # ComfyUI-Lora-Manager
+  comfyui-lora-manager = pkgs.stdenv.mkDerivation {
+    pname = "comfyui-lora-manager";
+    version = versions.customNodes.comfyui-lora-manager.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.comfyui-lora-manager.owner;
+      repo = versions.customNodes.comfyui-lora-manager.repo;
+      rev = versions.customNodes.comfyui-lora-manager.rev;
+      hash = versions.customNodes.comfyui-lora-manager.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    # Python dependencies required by KJNodes
+    passthru.pythonDeps =
+      ps: with ps; [
+        color-matcher
+        mss
+      ];
+
+    meta = with lib; {
+      description = "ComfyUI-Lora-Manager - A powerful extension for organizing, previewing, and integrating LoRA models with metadata and workflow support.";
+      homepage = "https://github.com/willmiao/ComfyUI-Lora-Manager";
+      license = licenses.gpl3;
+    };
+  };
+
 in
 {
   inherit
@@ -509,5 +545,6 @@ in
     pulid
     wanvideo
     comfyui-easy-use
+    comfyui-lora-manager
     ;
 }

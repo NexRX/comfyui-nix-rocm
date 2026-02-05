@@ -234,5 +234,13 @@
       rev = "7c470c67d6df44498e52c902173c1ac77cd5bdfd";
       hash = "sha256-H7YMFd0LVCgY3ZpTBu1a47DQ6R25ulJkuteRV2/zgD8=";
     };
+
+    comfyui-lora-manager = {
+      version = "2026-02-05";
+      owner = "yolain";
+      repo = "ComfyUI-Easy-Use";
+      rev = "7c470c67d6df44498e52c902173c1ac77cd5bdfd";
+      hash = "sha256-H7YMFd0LVCgY3ZpTBu1a47DQ6R25ulJkuteRV2/zgD8=";
+    };
   };
 }

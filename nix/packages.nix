@@ -396,7 +396,7 @@ let
 
             # Link our bundled custom nodes
             # Remove stale directories if they exist but aren't symlinks
-            for node_dir in "model_downloader" "ComfyUI-Impact-Pack" "rgthree-comfy" "ComfyUI-KJNodes" "ComfyUI-GGUF" "ComfyUI-LTXVideo" "ComfyUI-Florence2" "ComfyUI_bitsandbytes_NF4" "x-flux-comfyui" "ComfyUI-MMAudio" "PuLID_ComfyUI" "ComfyUI-WanVideoWrapper" "ComfyUI-Easy-Use"; do
+            for node_dir in "model_downloader" "ComfyUI-Impact-Pack" "rgthree-comfy" "ComfyUI-KJNodes" "ComfyUI-GGUF" "ComfyUI-LTXVideo" "ComfyUI-Florence2" "ComfyUI_bitsandbytes_NF4" "x-flux-comfyui" "ComfyUI-MMAudio" "PuLID_ComfyUI" "ComfyUI-WanVideoWrapper" "ComfyUI-Easy-Use" "ComfyUI-Lora-Manager"; do
               if [[ -e "$BASE_DIR/custom_nodes/$node_dir" && ! -L "$BASE_DIR/custom_nodes/$node_dir" ]]; then
                 rm -rf "$BASE_DIR/custom_nodes/$node_dir"
               fi
@@ -455,6 +455,9 @@ let
             fi
             if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI-Easy-Use" ]]; then
               ln -sf "${customNodes.comfyui-easy-use}" "$BASE_DIR/custom_nodes/ComfyUI-Easy-Use"
+            fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI-Lora-Manager" ]]; then
+              ln -sf "${customNodes.comfyui-lora-manager}" "$BASE_DIR/custom_nodes/ComfyUI-Lora-Manager"
             fi
 
             # Create default ComfyUI-Manager config if it doesn't exist
