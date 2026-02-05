@@ -129,6 +129,12 @@ let
         sqlalchemy
         av
         pydantic-settings
+        jinja2
+        olefile
+        natsort
+        aiosqlite
+        beautifulsoup4
+        platformdirs
       ];
       # ComfyUI Manager and common custom node dependencies
       extras =
@@ -172,6 +178,13 @@ let
           ftfy # Text encoding fixes
           # PuLID dependencies
           onnxruntime # ONNX runtime
+          # Newer Deps
+          jinja2
+          olefile
+          natsort
+          aiosqlite
+          beautifulsoup4
+          platformdirs
         ]
         ++ [ ps."color-matcher" ]; # Color matching (hyphenated name needs quoting)
       optionals =
