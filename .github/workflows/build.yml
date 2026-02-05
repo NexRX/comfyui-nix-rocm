@@ -5,18 +5,18 @@ on:
     branches:
       - main
     tags:
-      - 'v*'
+      - "v*"
     paths-ignore:
-      - '**.md'
-      - 'LICENSE'
-      - '.gitignore'
+      - "**.md"
+      - "LICENSE"
+      - ".gitignore"
   pull_request:
     branches:
       - main
     paths-ignore:
-      - '**.md'
-      - 'LICENSE'
-      - '.gitignore'
+      - "**.md"
+      - "LICENSE"
+      - ".gitignore"
   workflow_dispatch:
 
 concurrency:
@@ -61,11 +61,6 @@ jobs:
           name: nix-community
           pushFilter: "-"
 
-      - uses: cachix/cachix-action@v14
-        with:
-          name: cuda-maintainers
-          pushFilter: "-"
-
       - run: nix flake check --print-build-logs
 
   # Build Docker images and push store paths to Cachix
@@ -89,21 +84,21 @@ jobs:
             nix_target: dockerImage
             package_target: default
             platform: linux/amd64
-            tag_suffix: ''
+            tag_suffix: ""
             runner: ubuntu-latest
           - variant: cpu
             arch: aarch64-linux
             nix_target: dockerImage
             package_target: default
             platform: linux/arm64
-            tag_suffix: ''
+            tag_suffix: ""
             runner: ubuntu-24.04-arm
-          - variant: cuda
+          - variant: rocm
             arch: x86_64-linux
-            nix_target: dockerImageCuda
-            package_target: cuda
+            nix_target: dockerImageRocm
+            package_target: rocm
             platform: linux/amd64
-            tag_suffix: '-cuda'
+            tag_suffix: "-rocm"
             runner: ubuntu-latest
 
     steps:
@@ -136,18 +131,11 @@ jobs:
           authToken: ${{ env.CACHIX_AUTH_TOKEN }}
           pushFilter: ${{ env.CACHIX_AUTH_TOKEN && '' || '-' }}
 
-      # Pull from nix-community cache (has CUDA packages)
+      # Pull from nix-community cache
       - name: Configure Cachix (nix-community)
         uses: cachix/cachix-action@v14
         with:
           name: nix-community
-          pushFilter: "-"
-
-      # Pull from cuda-maintainers cache (legacy, still has packages)
-      - name: Configure Cachix (cuda-maintainers)
-        uses: cachix/cachix-action@v14
-        with:
-          name: cuda-maintainers
           pushFilter: "-"
 
       - name: Free disk space
@@ -160,27 +148,7 @@ jobs:
           sudo rm -rf /var/lib/apt/lists/*
           sudo apt-get clean
           docker system prune -af || true
-          # Extra cleanup for CUDA builds (needs maximum disk space)
-          if [[ "${{ matrix.variant }}" == "cuda" ]]; then
-            sudo rm -rf /usr/local/share/powershell
-            sudo rm -rf /usr/local/share/chromium
-            sudo rm -rf /usr/local/share/vcpkg
-            sudo rm -rf /usr/local/julia*
-            sudo rm -rf /usr/local/.ghcup
-            sudo rm -rf /usr/share/miniconda
-            sudo rm -rf /usr/share/az*
-            sudo rm -rf /usr/share/gradle*
-            sudo rm -rf /usr/share/sbt
-            sudo rm -rf /opt/ghc
-            sudo rm -rf /opt/az
-            sudo rm -rf /opt/microsoft
-            sudo rm -rf /opt/google
-            sudo rm -rf /opt/pipx
-            sudo rm -rf /imagegeneration
-            sudo rm -rf /home/runner/.rustup
-            sudo rm -rf /home/runner/.cargo
-            sudo rm -rf /home/runner/.dotnet
-          fi
+
           df -h
 
       - name: Log in to Container Registry
@@ -217,12 +185,7 @@ jobs:
       - name: Build Docker image with Nix
         run: |
           echo "Building ${{ matrix.variant }} variant for ${{ matrix.arch }}..."
-          # For CUDA builds, limit parallelism to reduce memory pressure
-          if [[ "${{ matrix.variant }}" == "cuda" ]]; then
-            nix build .#packages.${{ matrix.arch }}.${{ matrix.nix_target }} --print-build-logs --max-jobs 1 --cores 2
-          else
-            nix build .#packages.${{ matrix.arch }}.${{ matrix.nix_target }} --print-build-logs
-          fi
+          nix build .#packages.${{ matrix.arch }}.${{ matrix.nix_target }} --print-build-logs
 
           echo "Docker image built: $(readlink result)"
           ls -lh result
@@ -232,7 +195,6 @@ jobs:
         run: |
           # Use skopeo to push directly from the nix-built docker-archive
           # This avoids loading into Docker's local storage, saving disk space
-          # (critical for large CUDA images ~8GB+)
           echo "Pushing image using skopeo: ${{ steps.meta.outputs.tag }}"
 
           # Retry logic for large image pushes (GHCR can timeout on large layers)
@@ -263,13 +225,7 @@ jobs:
         run: |
           # Build the actual package (not Docker image) for caching
           nix build .#packages.${{ matrix.arch }}.${{ matrix.package_target }} -o result-pkg --print-build-logs
-
-          # For CUDA builds, include build-time dependencies (magma, triton, etc.)
-          if [[ "${{ matrix.variant }}" == "cuda" ]]; then
-            ./scripts/push-to-cachix.sh --build-deps ./result-pkg
-          else
-            ./scripts/push-to-cachix.sh ./result-pkg
-          fi
+          ./scripts/push-to-cachix.sh ./result-pkg
 
       - name: Generate build summary
         run: |
@@ -342,30 +298,30 @@ jobs:
             docker manifest push "$VERSION_TAG"
           fi
 
-      - name: Create and push CUDA manifest (x86_64 only)
+      - name: Create and push ROCm manifest (x86_64 only)
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            CUDA_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-cuda"
-            VERSION_CUDA_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}-cuda"
-            CUDA_AMD64_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-cuda-amd64"
+            ROCM_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-rocm"
+            VERSION_ROCM_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}-rocm"
+            ROCM_AMD64_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-rocm-amd64"
           elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             TAG_VERSION=${GITHUB_REF#refs/tags/v}
-            CUDA_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG_VERSION}-cuda"
-            VERSION_CUDA_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-cuda"
-            CUDA_AMD64_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG_VERSION}-cuda-amd64"
+            ROCM_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG_VERSION}-rocm"
+            VERSION_ROCM_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-rocm"
+            ROCM_AMD64_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG_VERSION}-rocm-amd64"
           fi
 
-          echo "Verifying CUDA image exists..."
-          if ! docker manifest inspect "$CUDA_AMD64_TAG" &>/dev/null; then
-            echo "ERROR: Required CUDA image not found: $CUDA_AMD64_TAG"
+          echo "Verifying ROCm image exists..."
+          if ! docker manifest inspect "$ROCM_AMD64_TAG" &>/dev/null; then
+            echo "ERROR: Required ROCm image not found: $ROCM_AMD64_TAG"
             exit 1
           fi
-          echo "Found: $CUDA_AMD64_TAG"
+          echo "Found: $ROCM_AMD64_TAG"
 
           # Use buildx imagetools to create tags without pulling the full image
-          echo "Creating CUDA tags via registry (no local pull required)..."
-          docker buildx imagetools create --tag "$CUDA_TAG" "$CUDA_AMD64_TAG"
-          docker buildx imagetools create --tag "$VERSION_CUDA_TAG" "$CUDA_AMD64_TAG"
+          echo "Creating ROCm tags via registry (no local pull required)..."
+          docker buildx imagetools create --tag "$ROCM_TAG" "$ROCM_AMD64_TAG"
+          docker buildx imagetools create --tag "$VERSION_ROCM_TAG" "$ROCM_AMD64_TAG"
 
       - name: Generate manifest summary
         run: |
@@ -378,9 +334,9 @@ jobs:
           echo "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### CUDA (amd64 only)" >> $GITHUB_STEP_SUMMARY
+          echo "### ROCm (amd64 only)" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          echo "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-cuda" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-rocm" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
   update-description:

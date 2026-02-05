@@ -22,12 +22,12 @@ expectations when working in this repository.
 ### Core Nix commands
 - `nix build`: build the default package without running it.
 - `nix run`: run ComfyUI (add `-- --open`, `--port=XXXX`, `--listen 0.0.0.0`).
-- `nix run .#cuda`: CUDA build on Linux/NVIDIA only.
+- `nix run .#rocm`: ROCm build on Linux/AMD only.
 - `nix flake check`: run all checks (build, ruff, pyright, nixfmt, shellcheck).
 - `nix fmt`: format Nix files with `nixfmt-rfc-style`.
 - `nix run .#update`: check for ComfyUI version updates.
 - `nix run .#buildDocker`: build CPU Docker image.
-- `nix run .#buildDockerCuda`: build CUDA Docker image.
+- `nix run .#buildDockerRocm`: build ROCm Docker image.
 
 ### Python linting and formatting
 - `ruff check src/`: run linting on all Python sources.

@@ -5,12 +5,10 @@
     extra-substituters = [
       "https://comfyui.cachix.org"
       "https://nix-community.cachix.org"
-      "https://cuda-maintainers.cachix.org" # Legacy, still works
     ];
     extra-trusted-public-keys = [
       "comfyui.cachix.org-1:33mf9VzoIjzVbp0zwj+fT51HG0y31ZTK3nzYZAX0rec="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
     ];
   };
 
@@ -30,7 +28,7 @@
     in
     flake-parts.lib.mkFlake { inherit inputs; } {
       # Supported systems: Linux (x86_64, aarch64), macOS (Intel, Apple Silicon)
-      # Note: CUDA support is only available on x86_64-linux
+      # Note: ROCm support is only available on x86_64-linux
       systems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -50,14 +48,14 @@
         }:
         let
           # =======================================================================
-          # CUDA Support via Pre-built Wheels
+          # ROCm Support via Pre-built Wheels
           # =======================================================================
-          # CUDA support uses pre-built PyTorch wheels from pytorch.org instead of
+          # ROCm support uses pre-built PyTorch wheels from pytorch.org instead of
           # compiling from source. This provides:
           # - Fast builds (download ~2GB vs compile for hours)
           # - Low memory usage (no 30-60GB RAM requirement)
-          # - All GPU architectures supported (Pascal through Hopper)
-          # - CUDA 12.4 runtime bundled in wheels
+          # - AMD GPU architectures supported (RX 6000/7000 series)
+          # - ROCm 7.1 runtime bundled in wheels
           # =======================================================================
 
           # Linux pkgs for cross-building Docker images from any system
@@ -82,24 +80,23 @@
           };
 
           pythonOverridesFor =
-            pkgs: cudaSupport: rocmSupport:
+            pkgs: rocmSupport:
             import ./nix/python-overrides.nix {
               inherit
                 pkgs
                 versions
-                cudaSupport
                 rocmSupport
                 ;
             };
 
           mkPython =
-            pkgs: cudaSupport: rocmSupport:
-            pkgs.python312.override { packageOverrides = pythonOverridesFor pkgs cudaSupport rocmSupport; };
+            pkgs: rocmSupport:
+            pkgs.python312.override { packageOverrides = pythonOverridesFor pkgs rocmSupport; };
 
           mkPythonEnv =
             pkgs:
             let
-              python = mkPython pkgs false false;
+              python = mkPython pkgs false;
             in
             python.withPackages (ps: [
               ps.setuptools
@@ -110,31 +107,25 @@
           mkComfyPackages =
             pkgs:
             {
-              cudaSupport ? false,
               rocmSupport ? false,
             }:
             import ./nix/packages.nix {
               inherit
                 pkgs
                 versions
-                cudaSupport
                 rocmSupport
                 ;
               lib = pkgs.lib;
-              pythonOverrides = pythonOverridesFor pkgs cudaSupport rocmSupport;
+              pythonOverrides = pythonOverridesFor pkgs rocmSupport;
             };
 
           # Linux packages for Docker image cross-builds
           linuxX86Packages = mkComfyPackages pkgsLinuxX86 { };
-          # Docker CUDA images use pre-built wheels (all architectures supported)
-          linuxX86PackagesCuda = mkComfyPackages pkgsLinuxX86 { cudaSupport = true; };
           # Docker ROCm images use pre-built wheels (AMD GPU support)
           linuxX86PackagesRocm = mkComfyPackages pkgsLinuxX86 { rocmSupport = true; };
           linuxArm64Packages = mkComfyPackages pkgsLinuxArm64 { };
 
           nativePackages = mkComfyPackages pkgs { };
-          # CUDA uses pre-built wheels (supports all GPU architectures)
-          nativePackagesCuda = mkComfyPackages pkgs { cudaSupport = true; };
           # ROCm uses pre-built wheels (AMD GPU support)
           nativePackagesRocm = mkComfyPackages pkgs { rocmSupport = true; };
 
@@ -144,7 +135,7 @@
           customNodes = import ./nix/custom-nodes.nix {
             inherit pkgs versions;
             lib = pkgs.lib;
-            python = mkPython pkgs false false;
+            python = mkPython pkgs false;
           };
 
           source = pkgs.lib.cleanSourceWith {
@@ -187,7 +178,6 @@
             # Cross-platform Docker image builds (use remote builder on non-Linux)
             # These are always available regardless of host system
             dockerImageLinux = linuxX86Packages.dockerImage;
-            dockerImageLinuxCuda = linuxX86PackagesCuda.dockerImageCuda;
             dockerImageLinuxRocm = linuxX86PackagesRocm.dockerImageRocm;
             dockerImageLinuxArm64 = linuxArm64Packages.dockerImage;
           }
@@ -195,9 +185,6 @@
             dockerImage = nativePackages.dockerImage;
           }
           // pkgs.lib.optionalAttrs (pkgs.stdenv.isLinux && pkgs.stdenv.isx86_64) {
-            # CUDA package uses pre-built wheels (supports all GPU architectures)
-            cuda = nativePackagesCuda.default;
-            dockerImageCuda = nativePackagesCuda.dockerImageCuda;
             # ROCm package uses pre-built wheels (AMD GPU support)
             rocm = nativePackagesRocm.default;
             dockerImageRocm = nativePackagesRocm.dockerImageRocm;
@@ -267,12 +254,6 @@
           comfyui-nix = self.legacyPackages.${final.system};
           comfyui = self.packages.${final.system}.default;
           comfy-ui = self.packages.${final.system}.default;
-          # CUDA variant (x86_64 Linux only) - uses pre-built wheels supporting all GPU architectures
-          comfy-ui-cuda =
-            if final.stdenv.isLinux && final.stdenv.isx86_64 then
-              self.packages.${final.system}.cuda
-            else
-              throw "comfy-ui-cuda is only available on x86_64 Linux";
           # ROCm variant (x86_64 Linux only) - uses pre-built wheels for AMD GPU support
           comfy-ui-rocm =
             if final.stdenv.isLinux && final.stdenv.isx86_64 then

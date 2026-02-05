@@ -9,7 +9,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Build/Run Commands
 - **Run application**: `nix run` (default)
 - **Run with browser**: `nix run -- --open` (automatically opens browser)
-- **Run with CUDA**: `nix run .#cuda` (Linux/NVIDIA only, uses pre-built PyTorch CUDA wheels)
 - **Run with ROCm**: `nix run .#rocm` (Linux/AMD only, uses pre-built PyTorch ROCm wheels)
 - **Run with custom port**: `nix run -- --port=8080` (specify custom port)
 - **Run with network access**: `nix run -- --listen 0.0.0.0` (allow external connections)
@@ -17,13 +16,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Build with Nix**: `nix build` (builds the app without running)
 - **Check for updates**: `nix run .#update` (shows latest ComfyUI version and update instructions)
 - **Build Docker image**: `nix run .#buildDocker` (creates `comfy-ui:latest` image)
-- **Build CUDA Docker**: `nix run .#buildDockerCuda` (creates `comfy-ui:cuda` image)
 - **Build ROCm Docker**: `nix run .#buildDockerRocm` (creates `comfy-ui:rocm` image)
 - **Pull pre-built Docker**: `docker pull ghcr.io/utensils/comfyui-nix:latest`
-- **Pull pre-built CUDA**: `docker pull ghcr.io/utensils/comfyui-nix:latest-cuda`
 - **Pull pre-built ROCm**: `docker pull ghcr.io/utensils/comfyui-nix:latest-rocm`
 - **Run Docker container**: `docker run -p 8188:8188 -v $PWD/data:/data comfy-ui:latest`
-- **Run CUDA Docker**: `docker run --gpus all -p 8188:8188 -v $PWD/data:/data comfy-ui:cuda`
 - **Run ROCm Docker**: `docker run --device=/dev/kfd --device=/dev/dri -p 8188:8188 -v $PWD/data:/data comfy-ui:rocm`
 - **Develop with Nix**: `nix develop` (opens development shell)
 - **Add to profile**: `nix profile add github:utensils/comfyui-nix` (ad-hoc, prefer system config)
@@ -40,7 +36,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Template input files: auto-generated in `nix/template-inputs.nix`
   - Update with: `./scripts/update-template-inputs.sh && git add nix/template-inputs.nix`
 - Python version: 3.12 (stable for ML workloads)
-- PyTorch: CPU builds use nixpkgs; CUDA builds use pre-built wheels from pytorch.org; ROCm builds use pre-built wheels from pytorch.org
+- PyTorch: CPU builds use nixpkgs; ROCm builds use pre-built wheels from pytorch.org
 
 ## Project Architecture
 
@@ -90,10 +86,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Platform-Specific Configuration
 - CPU builds use Nix-provided PyTorch packages (no runtime detection or installs)
-- CUDA support via `nix run .#cuda` (Linux/NVIDIA only):
-  - Uses pre-built PyTorch wheels from pytorch.org (fast builds, ~2GB download)
-  - Supports all GPU architectures (Pascal through Hopper) in a single build
-  - CUDA 12.4 runtime bundled in wheels (no separate toolkit needed)
 - ROCm support via `nix run .#rocm` (Linux/AMD only):
   - Uses pre-built PyTorch wheels from pytorch.org (fast builds, ~2GB download)
   - ROCm 7.1 runtime bundled in wheels (no separate ROCm toolkit needed)
@@ -124,7 +116,7 @@ ComfyUI runs directly from the Nix store; no application files are copied to you
 - **Purpose**: Automatically build and publish Docker images to GitHub Container Registry
 - **Triggers**: Push to main, version tags (v*), pull requests
 - **Multi-Architecture**: CPU images built for both amd64 and arm64 (via QEMU emulation)
-- **Build Matrix**: CPU (multi-arch), CUDA (x86_64 only), and ROCm (x86_64 only) variants built in parallel
+- **Build Matrix**: CPU (multi-arch) and ROCm (x86_64 only) variants built in parallel
 - **Outputs**: Images published to `ghcr.io/utensils/comfyui-nix`
 - **Tags**:
   - Main branch: `latest`, `X.Y.Z` (from `nix/versions.nix`)
@@ -145,7 +137,7 @@ ComfyUI runs directly from the Nix store; no application files are copied to you
 - **Location**: GitHub Container Registry (ghcr.io)
 - **Public Access**: All images are publicly readable
 - **Namespace**: `ghcr.io/utensils/comfyui-nix`
-- **Variants**: CPU (`:latest`, multi-arch), CUDA (`:latest-cuda`, x86_64 only), and ROCm (`:latest-rocm`, x86_64 only)
+- **Variants**: CPU (`:latest`, multi-arch) and ROCm (`:latest-rocm`, x86_64 only)
 - **Architectures**: amd64 (x86_64) and arm64 (aarch64/Apple Silicon) for CPU images
 
 ## ROCm Support Summary
@@ -168,7 +160,7 @@ ROCm support has been fully integrated into the project, providing AMD GPU accel
 ```nix
 services.comfyui = {
   enable = true;
-  rocm = true;  # Enable AMD GPU support (mutually exclusive with cuda)
+  rocm = true;  # Enable AMD GPU support
   dataDir = "/var/lib/comfyui";
 };
 ```
@@ -180,12 +172,12 @@ services.comfyui = {
 - `nix/docker.nix`: Added ROCm Docker image support with HSA environment variables
 - `flake.nix`: Added rocm packages, apps, and Docker images
 - `nix/apps.nix`: Added rocm, buildDockerRocm, and buildDockerLinuxRocm apps
-- `nix/modules/comfyui.nix`: Added rocm option with mutual exclusivity assertion for cuda
+- `nix/modules/comfyui.nix`: Added rocm option
 - `CLAUDE.md`: Updated documentation with ROCm commands
 - `README.md`: Added ROCm sections for quick start, GPU support, overlay packages, and Docker
 
 ### Technical Details
-- ROCm packages use `rocmSupport` flag (mutually exclusive with `cudaSupport`)
+- ROCm packages use `rocmSupport` flag
 - ROCm libraries from `pkgs.rocmPackages`: clr, rocm-core, hipblas, miopen, rocblas, etc.
 - Library paths automatically configured via `LD_LIBRARY_PATH` on Linux
 - Docker images use `--device=/dev/kfd --device=/dev/dri` for GPU access

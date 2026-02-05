@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### BREAKING CHANGES
+- **Removed all CUDA support** - This project now exclusively supports ROCm for GPU acceleration
+  - Removed `cuda` option from NixOS module
+  - Removed `cudaCapabilities` option from NixOS module
+  - Removed `pkgs.comfy-ui-cuda` from overlay
+  - Removed `nix run .#cuda` app
+  - Removed all CUDA Docker images (`:latest-cuda`)
+  - Removed CUDA-related CI/CD workflows
+  - Removed CUDA PyTorch wheel definitions from `nix/versions.nix`
+  - Users requiring NVIDIA GPU support should use ROCm or seek alternative solutions
+
+### Removed
+- CUDA support removed entirely from project
+- CUDA-maintainers cachix cache removed from nixConfig
+- All CUDA-specific documentation removed
+
 ## [0.7.0-2] - 2025-01-10
 
 ### Changed

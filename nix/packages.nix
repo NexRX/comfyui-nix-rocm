@@ -3,11 +3,9 @@
   lib,
   versions,
   pythonOverrides,
-  cudaSupport ? false,
   rocmSupport ? false,
 }:
 let
-  useCuda = cudaSupport && !rocmSupport;
   useRocm = rocmSupport;
 
   python = pkgs.python312.override { packageOverrides = pythonOverrides; };
@@ -261,7 +259,8 @@ let
         # Linux: Set LD_LIBRARY_PATH for dynamic libraries
         export LD_LIBRARY_PATH="${libPath}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
-        # Add NVIDIA driver libraries if available (NixOS)
+        # Add GPU driver libraries if available (NixOS)
+        # This includes ROCm drivers and OpenGL libraries
         if [[ -d "/run/opengl-driver/lib" ]]; then
           export LD_LIBRARY_PATH="/run/opengl-driver/lib:$LD_LIBRARY_PATH"
         fi
@@ -614,18 +613,6 @@ let
     };
   };
 
-  dockerImageCuda = dockerLib.mkDockerImage {
-    name = "comfy-ui";
-    tag = "cuda";
-    comfyUiPackage = comfyUiPackage;
-    cudaSupport = true;
-    cudaVersion = "cu124";
-    extraLabels = {
-      "org.opencontainers.image.version" = versions.comfyui.version;
-      "com.nvidia.volumes.needed" = "nvidia_driver";
-    };
-  };
-
   dockerImageRocm = dockerLib.mkDockerImage {
     name = "comfy-ui";
     tag = "rocm";
@@ -642,7 +629,6 @@ in
   default = comfyUiPackage;
   inherit
     dockerImage
-    dockerImageCuda
     dockerImageRocm
     pythonRuntime
     comfyuiSrc

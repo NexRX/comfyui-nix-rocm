@@ -8,15 +8,8 @@ let
   cfg = config.services.comfyui;
 
   # Determine which package to use based on configuration
-  # CUDA package uses pre-built wheels supporting all GPU architectures (Pascal through Hopper)
   # ROCm package uses pre-built wheels supporting AMD Radeon RX 6000/7000 series
-  resolvePackage =
-    if cfg.cuda then
-      pkgs.comfy-ui-cuda
-    else if cfg.rocm then
-      pkgs.comfy-ui-rocm
-    else
-      pkgs.comfy-ui;
+  resolvePackage = if cfg.rocm then pkgs.comfy-ui-rocm else pkgs.comfy-ui;
   args = [
     "--listen"
     cfg.listenAddress
@@ -75,21 +68,6 @@ in
   options.services.comfyui = {
     enable = lib.mkEnableOption "ComfyUI service";
 
-    cuda = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = ''
-        Enable CUDA support for NVIDIA GPUs. This is recommended for most users
-        with NVIDIA graphics cards as it provides significant performance improvements.
-
-        When enabled, uses pre-built PyTorch CUDA wheels that support all GPU
-        architectures from Pascal (GTX 1080) through Hopper (H100) in a single package.
-        Requires NVIDIA drivers to be installed on the system.
-
-        Mutually exclusive with rocm option.
-      '';
-    };
-
     rocm = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -100,35 +78,6 @@ in
         When enabled, uses pre-built PyTorch ROCm wheels that support AMD Radeon
         RX 6000 and 7000 series GPUs with ROCm 7.1 libraries bundled.
         Requires ROCm drivers to be installed on the system.
-
-        Mutually exclusive with cuda option.
-      '';
-    };
-
-    cudaCapabilities = lib.mkOption {
-      type = lib.types.nullOr (lib.types.listOf lib.types.str);
-      default = null;
-      description = ''
-        Optional list of CUDA compute capabilities to use for builds that honor
-        `nixpkgs.config.cudaCapabilities`. When set, this updates the global
-        nixpkgs configuration, so it affects other CUDA packages too.
-
-        Note: ComfyUI's pre-built PyTorch wheels already support all GPU
-        architectures (Pascal through Hopper). This setting is primarily useful
-        for optimizing other CUDA-enabled packages in your system configuration.
-
-        Example: [ "8.9" ] for Ada Lovelace (RTX 40xx) GPUs.
-
-        Common values:
-        - "6.1": Pascal (GTX 1080/1070)
-        - "7.0": Volta (V100)
-        - "7.5": Turing (RTX 20xx, GTX 16xx)
-        - "8.0": Ampere (A100)
-        - "8.6": Ampere (RTX 30xx)
-        - "8.9": Ada Lovelace (RTX 40xx)
-        - "9.0": Hopper (H100)
-
-        See: https://developer.nvidia.com/cuda-gpus
       '';
     };
 
@@ -148,13 +97,11 @@ in
       type = lib.types.package;
       default = resolvePackage;
       defaultText = lib.literalExpression ''
-        if cuda then pkgs.comfy-ui-cuda
-        else if rocm then pkgs.comfy-ui-rocm
+        if rocm then pkgs.comfy-ui-rocm
         else pkgs.comfy-ui
       '';
       description = ''
         ComfyUI package to run. Automatically set based on GPU configuration:
-        - `cuda = true`: CUDA package (supports all NVIDIA GPU architectures)
         - `rocm = true`: ROCm package (supports AMD Radeon RX 6000/7000 series)
         - Otherwise: CPU-only build
 
@@ -270,16 +217,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    assertions = [
-      {
-        assertion = !(cfg.cuda && cfg.rocm);
-        message = "services.comfyui: cuda and rocm options are mutually exclusive. Please enable only one.";
-      }
-    ];
-
-    nixpkgs.config = lib.mkIf (cfg.cudaCapabilities != null) {
-      cudaCapabilities = cfg.cudaCapabilities;
-    };
 
     # Create system user/group only when using default "comfyui" names
     users.users = lib.mkIf (cfg.createUser && isSystemUser) {

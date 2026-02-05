@@ -96,7 +96,7 @@
 
   # Pre-built PyTorch wheels from pytorch.org
   # These avoid compiling PyTorch from source (which requires 30-60GB RAM)
-  # CUDA wheels bundle CUDA libraries, so no separate CUDA toolkit needed at runtime
+  # ROCm wheels bundle ROCm libraries, so no separate ROCm toolkit needed at runtime
   # macOS wheels use PyTorch 2.5.1 to avoid MPS issues on macOS 26 (Tahoe)
   pytorchWheels = {
     # macOS Apple Silicon (arm64) - PyTorch 2.5.1 (2.9.x has MPS bugs on macOS 26)
@@ -117,25 +117,7 @@
         hash = "sha256-8cv9/Ru9++conUenTzb/bF2HwyBWBiAv71p/tpP2HPA=";
       };
     };
-    # Linux x86_64 CUDA 12.4
-    cu124 = {
-      torch = {
-        version = "2.5.1";
-        url = "https://download.pytorch.org/whl/cu124/torch-2.5.1%2Bcu124-cp312-cp312-linux_x86_64.whl";
-        hash = "sha256-v2SEv+W8T5KkoaG/VTBBUF4ZqRH3FwZTMOsGGv4OFNc=";
-      };
-      torchvision = {
-        version = "0.20.1";
-        url = "https://download.pytorch.org/whl/cu124/torchvision-0.20.1%2Bcu124-cp312-cp312-linux_x86_64.whl";
-        hash = "sha256-0QU+xQVFSefawmE7FRv/4yPzySSTnSlt9NfTSSWq860=";
-      };
-      torchaudio = {
-        version = "2.5.1";
-        url = "https://download.pytorch.org/whl/cu124/torchaudio-2.5.1%2Bcu124-cp312-cp312-linux_x86_64.whl";
-        hash = "sha256-mQJZjgMwrurQvBVFg3gE6yaFSbm0zkGuPKUbI4SQTok=";
-      };
-    };
-    # Linux x86_64 ROCm (placeholder - update URLs/hashes as needed)
+    # Linux x86_64 ROCm 7.1
     rocm = {
       torch = {
         version = "2.10.0";
