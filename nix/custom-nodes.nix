@@ -480,7 +480,7 @@ let
       runHook postInstall
     '';
 
-    # Python dependencies required by KJNodes
+    # Python dependencies required by comfyui-easy-use
     passthru.pythonDeps =
       ps: with ps; [
         color-matcher
@@ -516,7 +516,7 @@ let
       runHook postInstall
     '';
 
-    # Python dependencies required by KJNodes
+    # Python dependencies required by ComfyUI-Lora-Manager
     passthru.pythonDeps =
       ps: with ps; [
         color-matcher
