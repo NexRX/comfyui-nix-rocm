@@ -467,7 +467,7 @@ let
               ln -sf "${customNodes.wanvideo}" "$BASE_DIR/custom_nodes/ComfyUI-WanVideoWrapper"
             fi
             if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI-Easy-Use" ]]; then
-              ln -sf "${customNodes.comfyui-easy-use}" "$BASE_DIR/custom_nodes/ComfyUI-Easy-Use"
+              cp -r "${customNodes.comfyui-easy-use}" "$BASE_DIR/custom_nodes/ComfyUI-Easy-Use"
             fi
             if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI-Lora-Manager" ]]; then
               ln -sf "${customNodes.comfyui-lora-manager}" "$BASE_DIR/custom_nodes/ComfyUI-Lora-Manager"
