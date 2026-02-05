@@ -189,6 +189,11 @@ let
           tqdm
           psutil
           rotary-embedding-torch
+          # colour-science # needed by comfyui_essentials_mb - not in nixpkgs, will need to do manual https://github.com/KohakuBlueleaf/PixelOE
+          # pixeloe # needed by comfyui_essentials_mb - not in nixpkgs, will need to do manual https://github.com/KohakuBlueleaf/PixelOE
+          # transparent-background # needed by comfyui_essentials_mb - not in nixpkgs, will need to do manual https://github.com/KohakuBlueleaf/PixelOE
+          numba
+          rembg
         ]
         ++ [ ps."color-matcher" ]; # Color matching (hyphenated name needs quoting)
       optionals =
@@ -502,6 +507,9 @@ let
             fi
             if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI-Logic" ]]; then
               ln -sf "${customNodes.comfyui-logic}" "$BASE_DIR/custom_nodes/ComfyUI-Logic"
+            fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI_essentials_mb" ]]; then
+                ln -sf "${customNodes.comfyui_essentials_mb}" "$BASE_DIR/custom_nodes/ComfyUI_essentials_mb"
             fi
 
             # Create default ComfyUI-Manager config if it doesn't exist

@@ -282,5 +282,13 @@
       rev = "ce53961d17a172fe06f96f5ab6540fd3ef8a353f"; # v1.0.0
       hash = "sha256-ak3+XTBArZKkmU7XIq1nXi0XK1gvZ1wh1CVc/bs3Y3U=";
     };
+
+    comfyui_essentials_mb = {
+      version = "2026-02-05";
+      owner = "MinorBoy";
+      repo = "ComfyUI_essentials_mb";
+      rev = "67d7ceb97d465d66a8768069775fc30edee66991"; # v1.1.1
+      hash = "sha256-c/oUbt5S2eEv5Y6ZrijHMWys6SYlou+lSfjZ9Q9NVSM=";
+    };
   };
 }

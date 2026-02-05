@@ -704,7 +704,7 @@ let
     };
   };
 
-  # SeedVR2
+  # comfyui-logic
   comfyui-logic = pkgs.stdenv.mkDerivation {
     pname = "comfyui-logic";
     version = versions.customNodes.comfyui-logic.version;
@@ -738,6 +738,45 @@ let
     };
   };
 
+  # comfyui_essentials_mb
+  comfyui_essentials_mb = pkgs.stdenv.mkDerivation {
+    pname = "comfyui_essentials_mb";
+    version = versions.customNodes.comfyui_essentials_mb.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.comfyui_essentials_mb.owner;
+      repo = versions.customNodes.comfyui_essentials_mb.repo;
+      rev = versions.customNodes.comfyui_essentials_mb.rev;
+      hash = versions.customNodes.comfyui_essentials_mb.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    # Python dependencies required
+    passthru.pythonDeps =
+      ps: with ps; [
+        numba
+        colour-science
+        rembg
+        pixeloe
+        transparent-background
+      ];
+
+    meta = with lib; {
+      description = "ComfyUI_essentials_mb";
+      homepage = "https://github.com/MinorBoy/ComfyUI_essentials_mb";
+      license = licenses.gpl3;
+    };
+  };
+
 in
 {
   inherit
@@ -759,5 +798,6 @@ in
     comfyui-videohelpersuite
     comfyui-seedvr2_videoupscaler
     comfyui-logic
+    comfyui_essentials_mb
     ;
 }
