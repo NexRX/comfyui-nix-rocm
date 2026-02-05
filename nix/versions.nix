@@ -232,7 +232,7 @@
       owner = "yolain";
       repo = "ComfyUI-Easy-Use";
       rev = "7c470c67d6df44498e52c902173c1ac77cd5bdfd";
-      hash = "sha256-H7YMFd0LVCgY3ZpTBu1a47DQ6R25ulJkuteRV2/zgD8=";
+      hash = "sha256-H7YMFd0LVCgY3ZpTBu1a47DQ6R25ulJkuteRV2/AAAA=";
     };
 
     comfyui-lora-manager = {
@@ -240,7 +240,7 @@
       owner = "willmiao";
       repo = "ComfyUI-Lora-Manager";
       rev = "b313f36be96a202a36fa2d8bcf24cbb52fb354fc";
-      hash = "sha256-H7YMFd0LVCgY3ZpTBu1a47DQ6R25ulJkuteRV2/zgD8=";
+      hash = "sha256-H7YMFd0LVCgY3ZpTBu1a47DQ6R25ulJkuteRV2/BBBB=";
     };
   };
 }
