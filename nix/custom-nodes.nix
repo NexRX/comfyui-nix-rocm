@@ -483,8 +483,16 @@ let
     # Python dependencies required by comfyui-easy-use
     passthru.pythonDeps =
       ps: with ps; [
-        color-matcher
-        mss
+        ftfy
+        accelerate
+        peft
+        diffusers
+        sentencepiece
+        protobuf
+        gguf
+        opencv4
+        scipy
+        einops
       ];
 
     meta = with lib; {
@@ -519,8 +527,16 @@ let
     # Python dependencies required by ComfyUI-Lora-Manager
     passthru.pythonDeps =
       ps: with ps; [
-        color-matcher
-        mss
+        ftfy
+        accelerate
+        peft
+        diffusers
+        sentencepiece
+        protobuf
+        gguf
+        opencv4
+        scipy
+        einops
       ];
 
     meta = with lib; {
