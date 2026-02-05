@@ -240,7 +240,7 @@
       owner = "willmiao";
       repo = "ComfyUI-Lora-Manager";
       rev = "b313f36be96a202a36fa2d8bcf24cbb52fb354fc";
-      hash = "sha256-H7YMFd0LVCgY3ZpTBu1a47DQ6R25ulJkuteRV2/BBBB=";
+      hash = "sha256-8T3KMPWyFYNrI8sV82hai+posz2LP1oaLyzKtnDjo1Y=";
     };
   };
 }
