@@ -549,6 +549,45 @@ let
     };
   };
 
+  # ComfyUI-Lora-Manager
+  comfyui-impact-subpack = pkgs.stdenv.mkDerivation {
+    pname = "comfyui-impact-subpack";
+    version = versions.customNodes.comfyui-impact-subpack.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.comfyui-impact-subpack.owner;
+      repo = versions.customNodes.comfyui-impact-subpack.repo;
+      rev = versions.customNodes.comfyui-impact-subpack.rev;
+      hash = versions.customNodes.comfyui-impact-subpack.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    # Python dependencies required by ComfyUI-Lora-Manager
+    passthru.pythonDeps =
+      ps: with ps; [
+        matplotlib
+        ultralytics
+        numpy
+        opencv-python-headless
+        dill
+      ];
+
+    meta = with lib; {
+      description = "ComfyUI-Impact-Subpack - This extension serves as a complement to the Impact Pack, offering features that are not deemed suitable for inclusion by default in the ComfyUI Impact Pack";
+      homepage = "https://github.com/ltdrdata/ComfyUI-Impact-Subpack";
+      license = licenses.gpl3;
+    };
+  };
+
 in
 {
   inherit
@@ -565,5 +604,6 @@ in
     wanvideo
     comfyui-easy-use
     comfyui-lora-manager
+    comfyui-impact-subpack
     ;
 }

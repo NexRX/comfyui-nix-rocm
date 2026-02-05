@@ -135,6 +135,7 @@ let
         aiosqlite
         beautifulsoup4
         platformdirs
+        ultralytics
       ];
       # ComfyUI Manager and common custom node dependencies
       extras =
@@ -472,6 +473,9 @@ let
             fi
             if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI-Lora-Manager" ]]; then
               ln -sf "${customNodes.comfyui-lora-manager}" "$BASE_DIR/custom_nodes/ComfyUI-Lora-Manager"
+            fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI-Impact-Subpack" ]]; then
+              ln -sf "${customNodes.comfyui-impact-subpack}" "$BASE_DIR/custom_nodes/ComfyUI-Impact-Subpack"
             fi
 
             # Create default ComfyUI-Manager config if it doesn't exist

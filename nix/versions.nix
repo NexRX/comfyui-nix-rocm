@@ -242,5 +242,13 @@
       rev = "b313f36be96a202a36fa2d8bcf24cbb52fb354fc";
       hash = "sha256-8T3KMPWyFYNrI8sV82hai+posz2LP1oaLyzKtnDjo1Y=";
     };
+
+    comfyui-impact-subpack = {
+      version = "2026-02-05";
+      owner = "ltdrdata";
+      repo = "ComfyUI-Impact-Subpack";
+      rev = "50c7b71a6a224734cc9b21963c6d1926816a97f1";
+      hash = "sha256-+qYmGdHjrWYfJ+uqGURWk1y8kVR0pBc+ObjUyM0A7UA=";
+    };
   };
 }
