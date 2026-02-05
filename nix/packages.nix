@@ -73,7 +73,7 @@ let
     transformers>=4.0.0
     torch>=2.0.0
     torchvision>=0.15.0
-    numpy>=1.24.0
+    numpy>=1.24.0,<2.4
     pillow>=9.0.0
     safetensors>=0.3.0
     # Prevent ComfyUI-Manager from trying to "restore" vendored packages
