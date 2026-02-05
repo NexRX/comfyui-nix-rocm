@@ -148,11 +148,11 @@
     };
 
     rgthree-comfy = {
-      version = "1.0.0";
+      version = "1.0.2512112053";
       owner = "rgthree";
       repo = "rgthree-comfy";
-      rev = "v.1.0.0";
-      hash = "sha256-bzQcQ37v7ZrHDitZV6z3h/kdNbWxpLxNSvh0rSxnLss=";
+      rev = "8ff50e4521881eca1fe26aec9615fc9362474931";
+      hash = "sha256-MueLFV5gaK6vPI0BEPxL3ZueOK2eFcZzajLyo95HrOE=";
     };
 
     kjnodes = {
