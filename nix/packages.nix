@@ -194,6 +194,12 @@ let
           # transparent-background # needed by comfyui_essentials_mb - not in nixpkgs, will need to do manual https://github.com/KohakuBlueleaf/PixelOE
           numba
           rembg
+          qrcode
+          requirements-parser
+          imageio-ffmpeg
+          rich
+          rich-argparse
+          cachetools
         ]
         ++ [ ps."color-matcher" ]; # Color matching (hyphenated name needs quoting)
       optionals =
@@ -524,6 +530,9 @@ let
             fi
             if [[ ! -e "$BASE_DIR/custom_nodes/comfyui-frame-interpolation_cudafull" ]]; then
                 ln -sf "${customNodes.comfyui-frame-interpolation_cudafull}" "$BASE_DIR/custom_nodes/comfyui-frame-interpolation_cudafull"
+            fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/comfy_mtb" ]]; then
+                ln -sf "${customNodes.comfy_mtb}" "$BASE_DIR/custom_nodes/comfy_mtb"
             fi
 
             # Create default ComfyUI-Manager config if it doesn't exist

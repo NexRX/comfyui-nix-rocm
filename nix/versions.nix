@@ -322,5 +322,13 @@
       rev = "795c28e79036f243a6818b3492907fa475a03882";
       hash = "sha256-5zFhI8HdYvkuv7CBiZMBT1BbKBnC2Dit0xRXWiBjJsQ=";
     };
+
+    comfy_mtb = {
+      version = "2026-02-05";
+      owner = "melMass";
+      repo = "comfy_mtb";
+      rev = "d87e52ea2c112fd95f257dcd6a54a5db77a34fc3";
+      hash = "sha256-5zFhI8HdYvkuv7CBiZMBT1BbKBnC2Dit0xRXWiBjJsQ=";
+    };
   };
 }

@@ -923,6 +923,52 @@ let
     };
   };
 
+  # comfy_mtb
+  comfy_mtb = pkgs.stdenv.mkDerivation {
+    pname = "comfy_mtb";
+    version = versions.customNodes.comfy_mtb.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.comfy_mtb.owner;
+      repo = versions.customNodes.comfy_mtb.repo;
+      rev = versions.customNodes.comfy_mtb.rev;
+      hash = versions.customNodes.comfy_mtb.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    # Python dependencies required
+    passthru.pythonDeps =
+      ps: with ps; [
+        qrcode
+        onnxruntime # onnxruntime-gpu
+        requirements-parser
+        # opencv-contrib
+        rembg
+        imageio-ffmpeg
+        rich
+        rich-argparse
+        matplotlib
+        pillow
+        cachetools
+        transformers
+      ];
+
+    meta = with lib; {
+      description = "comfy_mtb";
+      homepage = "https://github.com/melMass/comfy_mtb";
+      license = licenses.gpl3;
+    };
+  };
+
 in
 {
   inherit
@@ -949,5 +995,6 @@ in
     comfyui_comfyroll_customnodes
     intelligentvramnode
     comfyui-frame-interpolation_cudafull
+    comfy_mtb
     ;
 }
