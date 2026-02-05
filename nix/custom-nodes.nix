@@ -483,16 +483,16 @@ let
     # Python dependencies required by comfyui-easy-use
     passthru.pythonDeps =
       ps: with ps; [
-        ftfy
-        accelerate
-        peft
         diffusers
+        accelerate
+        clip_interrogator>=0.6.0
+        lark
+        onnxruntime
+        opencv-python-headless
         sentencepiece
-        protobuf
-        gguf
-        opencv4
-        scipy
-        einops
+        spandrel
+        matplotlib
+        peft
       ];
 
     meta = with lib; {
@@ -527,17 +527,19 @@ let
     # Python dependencies required by ComfyUI-Lora-Manager
     passthru.pythonDeps =
       ps: with ps; [
-        ftfy
-        accelerate
-        peft
-        diffusers
-        sentencepiece
-        protobuf
-        gguf
-        opencv4
-        scipy
-        einops
+        aiohttp
+        jinja2
+        safetensors
+        piexif
+        Pillow
+        olefile
+        toml
+        numpy
         natsort
+        gitpython
+        aiosqlite
+        beautifulsoup4
+        platformdirs
       ];
 
     meta = with lib; {
