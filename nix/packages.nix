@@ -186,6 +186,9 @@ let
           aiosqlite
           beautifulsoup4
           platformdirs
+          tqdm
+          psutil
+          rotary-embedding-torch
         ]
         ++ [ ps."color-matcher" ]; # Color matching (hyphenated name needs quoting)
       optionals =
@@ -493,6 +496,9 @@ let
             if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI-VideoHelperSuite" ]]; then
               cp -r "${customNodes.comfyui-videohelpersuite}" "$BASE_DIR/custom_nodes/ComfyUI-VideoHelperSuite"
               chmod -R 777 "$BASE_DIR/custom_nodes/ComfyUI-VideoHelperSuite"
+            fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI-SeedVR2_VideoUpscaler" ]]; then
+              ln -sf "${customNodes.comfyui-seedvr2_videoupscaler}" "$BASE_DIR/custom_nodes/ComfyUI-SeedVR2_VideoUpscaler"
             fi
 
             # Create default ComfyUI-Manager config if it doesn't exist

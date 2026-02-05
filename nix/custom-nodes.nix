@@ -622,7 +622,7 @@ let
     };
   };
 
-  # ComfyUI-Custom-Scripts
+  # ComfyUI-VideoHelperSuite
   comfyui-videohelpersuite = pkgs.stdenv.mkDerivation {
     pname = "comfyui-videohelpersuite";
     version = versions.customNodes.comfyui-videohelpersuite.version;
@@ -652,8 +652,54 @@ let
       ];
 
     meta = with lib; {
-      description = "ComfyUI-VideoHelperSuite / PlaySound|pysssss - Enhancements & experiments for ComfyUI, mostly focusing on UI features";
+      description = "ComfyUI-VideoHelperSuite";
       homepage = "https://github.com/pythongosssss/ComfyUI-VideoHelperSuite";
+      license = licenses.gpl3;
+    };
+  };
+
+  # SeedVR2
+  comfyui-seedvr2_videoupscaler = pkgs.stdenv.mkDerivation {
+    pname = "comfyui-seedvr2_videoupscaler";
+    version = versions.customNodes.comfyui-seedvr2_videoupscaler.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.comfyui-seedvr2_videoupscaler.owner;
+      repo = versions.customNodes.comfyui-seedvr2_videoupscaler.repo;
+      rev = versions.customNodes.comfyui-seedvr2_videoupscaler.rev;
+      hash = versions.customNodes.comfyui-seedvr2_videoupscaler.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    # Python dependencies required by ComfyUI-Lora-Manager
+    passthru.pythonDeps =
+      ps: with ps; [
+        safetensors
+        numpy
+        tqdm
+        psutil
+        einops
+        omegaconf
+        diffusers
+        peft
+        rotary_embedding_torch
+        opencv-python
+        gguf
+        matplotlib
+      ];
+
+    meta = with lib; {
+      description = "ComfyUI-SeedVR2_VideoUpscaler";
+      homepage = "https://github.com/pythongosssss/SeedVR2";
       license = licenses.gpl3;
     };
   };
@@ -677,5 +723,6 @@ in
     comfyui-impact-subpack
     comfyui-custom-scripts
     comfyui-videohelpersuite
+    comfyui-seedvr2_videoupscaler
     ;
 }

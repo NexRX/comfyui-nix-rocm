@@ -266,5 +266,13 @@
       rev = "993082e4f2473bf4acaf06f51e33877a7eb38960";
       hash = "sha256-oII4aAK8O44MBaxOATG7tAXmF1ESRm7nacNmj1E3pE8=";
     };
+
+    comfyui-seedvr2_videoupscaler = {
+      version = "2026-02-05";
+      owner = "numz";
+      repo = "ComfyUI-SeedVR2_VideoUpscaler";
+      rev = "4df5cef5937001bcef056d5508c6a884849ffe13";
+      hash = "sha256-OTFawBd92k4jWpCaroX5civ2KPMAlIrqwg/r/+tDEkg=";
+    };
   };
 }
