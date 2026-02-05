@@ -500,6 +500,9 @@ let
             if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI-SeedVR2_VideoUpscaler" ]]; then
               ln -sf "${customNodes.comfyui-seedvr2_videoupscaler}" "$BASE_DIR/custom_nodes/ComfyUI-SeedVR2_VideoUpscaler"
             fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI-Logic" ]]; then
+              ln -sf "${customNodes.comfyui-logic}" "$BASE_DIR/custom_nodes/ComfyUI-Logic"
+            fi
 
             # Create default ComfyUI-Manager config if it doesn't exist
             # Note: Manager moved config from user/default/ComfyUI-Manager to user/__manager

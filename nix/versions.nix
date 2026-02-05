@@ -274,5 +274,13 @@
       rev = "4df5cef5937001bcef056d5508c6a884849ffe13";
       hash = "sha256-OTFawBd92k4jWpCaroX5civ2KPMAlIrqwg/r/+tDEkg=";
     };
+
+    comfyui-logic = {
+      version = "2026-02-05";
+      owner = "theUpsider";
+      repo = "ComfyUI-Logic";
+      rev = "ce53961d17a172fe06f96f5ab6540fd3ef8a353f"; # v1.0.0
+      hash = "sha256-ak3+XTBArZKkmU7XIq1nXi0XK1gvZ1wh1CVc/bs3Y3U=";
+    };
   };
 }

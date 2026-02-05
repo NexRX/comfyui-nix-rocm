@@ -571,7 +571,7 @@ let
       runHook postInstall
     '';
 
-    # Python dependencies required by ComfyUI-Lora-Manager
+    # Python dependencies required
     passthru.pythonDeps =
       ps: with ps; [
         matplotlib
@@ -610,7 +610,7 @@ let
       runHook postInstall
     '';
 
-    # Python dependencies required by ComfyUI-Lora-Manager
+    # Python dependencies required
     passthru.pythonDeps =
       ps: with ps; [
       ];
@@ -644,7 +644,7 @@ let
       runHook postInstall
     '';
 
-    # Python dependencies required by ComfyUI-Lora-Manager
+    # Python dependencies required
     passthru.pythonDeps =
       ps: with ps; [
         opencv-python
@@ -653,7 +653,7 @@ let
 
     meta = with lib; {
       description = "ComfyUI-VideoHelperSuite";
-      homepage = "https://github.com/pythongosssss/ComfyUI-VideoHelperSuite";
+      homepage = "https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite";
       license = licenses.gpl3;
     };
   };
@@ -680,7 +680,7 @@ let
       runHook postInstall
     '';
 
-    # Python dependencies required by ComfyUI-Lora-Manager
+    # Python dependencies required
     passthru.pythonDeps =
       ps: with ps; [
         safetensors
@@ -699,7 +699,41 @@ let
 
     meta = with lib; {
       description = "ComfyUI-SeedVR2_VideoUpscaler";
-      homepage = "https://github.com/pythongosssss/SeedVR2";
+      homepage = "https://github.com/numz/ComfyUI-SeedVR2_VideoUpscaler";
+      license = licenses.gpl3;
+    };
+  };
+
+  # SeedVR2
+  comfyui-logic = pkgs.stdenv.mkDerivation {
+    pname = "comfyui-logic";
+    version = versions.customNodes.comfyui-logic.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.comfyui-logic.owner;
+      repo = versions.customNodes.comfyui-logic.repo;
+      rev = versions.customNodes.comfyui-logic.rev;
+      hash = versions.customNodes.comfyui-logic.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    # Python dependencies required
+    passthru.pythonDeps =
+      ps: with ps; [
+      ];
+
+    meta = with lib; {
+      description = "ComfyUI-Logic";
+      homepage = "https://github.com/theUpsider/ComfyUI-Logic";
       license = licenses.gpl3;
     };
   };
@@ -724,5 +758,6 @@ in
     comfyui-custom-scripts
     comfyui-videohelpersuite
     comfyui-seedvr2_videoupscaler
+    comfyui-logic
     ;
 }
