@@ -537,6 +537,7 @@ let
         opencv4
         scipy
         einops
+        natsort
       ];
 
     meta = with lib; {
