@@ -314,5 +314,13 @@
       rev = "09bae855c3f9630d01c144f81610987e072bb6b9";
       hash = "sha256-OLCaj+FO4LRY6QtBYPTJY4upkVHbmG9ZKP+AdB6pi0k=";
     };
+
+    comfyui-frame-interpolation_cudafull = {
+      version = "2026-02-05";
+      owner = "eddyhhlure1Eddy";
+      repo = "comfyui-frame-interpolation_cudafull";
+      rev = "795c28e79036f243a6818b3492907fa475a03882";
+      hash = "sha256-5zFhI8HdYvkuv7CBiZMBT1BbKBnC2Dit0xRXWiBjJsQ=";
+    };
   };
 }

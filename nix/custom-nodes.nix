@@ -881,6 +881,48 @@ let
     };
   };
 
+  # comfyui-frame-interpolation_cudafull
+  comfyui-frame-interpolation_cudafull = pkgs.stdenv.mkDerivation {
+    pname = "comfyui-frame-interpolation_cudafull";
+    version = versions.customNodes.comfyui-frame-interpolation_cudafull.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.comfyui-frame-interpolation_cudafull.owner;
+      repo = versions.customNodes.comfyui-frame-interpolation_cudafull.repo;
+      rev = versions.customNodes.comfyui-frame-interpolation_cudafull.rev;
+      hash = versions.customNodes.comfyui-frame-interpolation_cudafull.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    # Python dependencies required
+    passthru.pythonDeps =
+      ps: with ps; [
+        numpy
+        einops
+        opencv-contrib-python
+        kornia
+        scipy
+        Pillow
+        torchvision
+        tqdm
+      ];
+
+    meta = with lib; {
+      description = "comfyui-frame-interpolation_cudafull";
+      homepage = "https://github.com/Fannovel16/comfyui-frame-interpolation_cudafull";
+      license = licenses.gpl3;
+    };
+  };
+
 in
 {
   inherit
@@ -906,5 +948,6 @@ in
     comfyliterals
     comfyui_comfyroll_customnodes
     intelligentvramnode
+    comfyui-frame-interpolation_cudafull
     ;
 }

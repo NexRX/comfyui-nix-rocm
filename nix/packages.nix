@@ -522,6 +522,9 @@ let
             if [[ ! -e "$BASE_DIR/custom_nodes/IntelligentVRAMNode" ]]; then
                 ln -sf "${customNodes.intelligentvramnode}" "$BASE_DIR/custom_nodes/IntelligentVRAMNode"
             fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/comfyui-frame-interpolation_cudafull" ]]; then
+                ln -sf "${customNodes.comfyui-frame-interpolation_cudafull}" "$BASE_DIR/custom_nodes/comfyui-frame-interpolation_cudafull"
+            fi
 
             # Create default ComfyUI-Manager config if it doesn't exist
             # Note: Manager moved config from user/default/ComfyUI-Manager to user/__manager
