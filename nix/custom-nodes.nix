@@ -458,6 +458,42 @@ let
     };
   };
 
+  # comfyui-easy-use
+  comfyui-easy-use = pkgs.stdenv.mkDerivation {
+    pname = "comfyui-easy-use";
+    version = versions.customNodes.kjnodes.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.comfyui-easy-use.owner;
+      repo = versions.customNodes.comfyui-easy-use.repo;
+      rev = versions.customNodes.comfyui-easy-use.rev;
+      hash = versions.customNodes.comfyui-easy-use.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    # Python dependencies required by KJNodes
+    passthru.pythonDeps =
+      ps: with ps; [
+        color-matcher
+        mss
+      ];
+
+    meta = with lib; {
+      description = "ComfyUI-Easy-Use - An efficiency custom nodes integration package";
+      homepage = "https://github.com/yolain/ComfyUI-Easy-Use";
+      license = licenses.gpl3;
+    };
+  };
+
 in
 {
   inherit
@@ -472,5 +508,6 @@ in
     mmaudio
     pulid
     wanvideo
+    comfyui-easy-use
     ;
 }
