@@ -480,6 +480,15 @@ let
             if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI-Custom-Scripts" ]]; then
               cp -r "${customNodes.comfyui-custom-scripts}" "$BASE_DIR/custom_nodes/ComfyUI-Custom-Scripts"
               chmod -R 777 "$BASE_DIR/custom_nodes/ComfyUI-Custom-Scripts"
+              # Patch to correct base dir with correct path
+              CUSTOM_SCRIPTS_MAIN="$BASE_DIR/custom_nodes/ComfyUI-Custom-Scripts/pysssss.py"
+              if [[ -f "$CUSTOM_SCRIPTS_MAIN" ]]; then
+                # Only patch if the exact line exists
+                if grep -q '^    dir = os.path.dirname(inspect.getfile(PromptServer))$' "$CUSTOM_SCRIPTS_MAIN"; then
+                  sed -i "s|^    dir = os.path.dirname(inspect.getfile(PromptServer))$|    dir = os.path.expandvars('$BASE_DIR')|" "$CUSTOM_SCRIPTS_MAIN"
+                  echo "Patched ComfyUI-Custom-Scripts pysssss.py for getcwd"
+                fi
+              fi
             fi
 
             # Create default ComfyUI-Manager config if it doesn't exist
