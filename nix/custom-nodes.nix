@@ -485,7 +485,7 @@ let
       ps: with ps; [
         diffusers
         accelerate
-        clip_interrogator>=0.6.0
+        clip_interrogator
         lark
         onnxruntime
         opencv-python-headless
