@@ -251,12 +251,20 @@
       hash = "sha256-+qYmGdHjrWYfJ+uqGURWk1y8kVR0pBc+ObjUyM0A7UA=";
     };
 
-  comfyui-custom-scripts = {
+    comfyui-custom-scripts = {
       version = "2026-02-05";
       owner = "pythongosssss";
       repo = "ComfyUI-Custom-Scripts";
       rev = "f2838ed5e59de4d73cde5c98354b87a8d3200190";
       hash = "sha256-0DgPrOFXOjQ4K1RKxLQdtGfJHbopP8iovoJqna8d+Gg=";
+    };
+
+    comfyui-videohelpersuite = {
+      version = "2026-02-05";
+      owner = "Kosinkadink";
+      repo = "ComfyUI-VideoHelperSuite";
+      rev = "993082e4f2473bf4acaf06f51e33877a7eb38960";
+      hash = "sha256-oII4aAK8O44MBaxOATG7tAXmF1ESRm7nacNmj1E3pE8=";
     };
   };
 }

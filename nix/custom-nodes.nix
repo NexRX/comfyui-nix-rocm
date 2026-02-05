@@ -622,6 +622,42 @@ let
     };
   };
 
+  # ComfyUI-Custom-Scripts
+  comfyui-videohelpersuite = pkgs.stdenv.mkDerivation {
+    pname = "comfyui-videohelpersuite";
+    version = versions.customNodes.comfyui-videohelpersuite.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.comfyui-videohelpersuite.owner;
+      repo = versions.customNodes.comfyui-videohelpersuite.repo;
+      rev = versions.customNodes.comfyui-videohelpersuite.rev;
+      hash = versions.customNodes.comfyui-videohelpersuite.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    # Python dependencies required by ComfyUI-Lora-Manager
+    passthru.pythonDeps =
+      ps: with ps; [
+        opencv-python
+        imageio-ffmpeg
+      ];
+
+    meta = with lib; {
+      description = "ComfyUI-VideoHelperSuite / PlaySound|pysssss - Enhancements & experiments for ComfyUI, mostly focusing on UI features";
+      homepage = "https://github.com/pythongosssss/ComfyUI-VideoHelperSuite";
+      license = licenses.gpl3;
+    };
+  };
+
 in
 {
   inherit
@@ -640,5 +676,6 @@ in
     comfyui-lora-manager
     comfyui-impact-subpack
     comfyui-custom-scripts
+    comfyui-videohelpersuite
     ;
 }

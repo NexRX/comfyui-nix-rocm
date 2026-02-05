@@ -490,6 +490,10 @@ let
                 fi
               fi
             fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI-VideoHelperSuite" ]]; then
+              cp -r "${customNodes.comfyui-videohelpersuite}" "$BASE_DIR/custom_nodes/ComfyUI-VideoHelperSuite"
+              chmod -R 777 "$BASE_DIR/custom_nodes/ComfyUI-VideoHelperSuite"
+            fi
 
             # Create default ComfyUI-Manager config if it doesn't exist
             # Note: Manager moved config from user/default/ComfyUI-Manager to user/__manager
