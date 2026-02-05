@@ -845,6 +845,42 @@ let
     };
   };
 
+  # intelligentvramnode
+  intelligentvramnode = pkgs.stdenv.mkDerivation {
+    pname = "intelligentvramnode";
+    version = versions.customNodes.intelligentvramnode.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.intelligentvramnode.owner;
+      repo = versions.customNodes.intelligentvramnode.repo;
+      rev = versions.customNodes.intelligentvramnode.rev;
+      hash = versions.customNodes.intelligentvramnode.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    # Python dependencies required
+    passthru.pythonDeps =
+      ps: with ps; [
+        psutil
+        numpy
+      ];
+
+    meta = with lib; {
+      description = "IntelligentVRAMNode";
+      homepage = "https://github.com/eddyhhlure1Eddy/IntelligentVRAMNode";
+      license = licenses.gpl3;
+    };
+  };
+
 in
 {
   inherit
@@ -869,5 +905,6 @@ in
     comfyui_essentials_mb
     comfyliterals
     comfyui_comfyroll_customnodes
+    intelligentvramnode
     ;
 }

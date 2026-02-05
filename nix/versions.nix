@@ -306,5 +306,13 @@
       rev = "d78b780ae43fcf8c6b7c6505e6ffb4584281ceca";
       hash = "sha256-+qhDJ9hawSEg9AGBz8w+UzohMFhgZDOzvenw8xVVyPc=";
     };
+
+    intelligentvramnode = {
+      version = "2026-02-05";
+      owner = "eddyhhlure1Eddy";
+      repo = "IntelligentVRAMNode";
+      rev = "09bae855c3f9630d01c144f81610987e072bb6b9";
+      hash = "sha256-OLCaj+FO4LRY6QtBYPTJY4upkVHbmG9ZKP+AdB6pi0k=";
+    };
   };
 }

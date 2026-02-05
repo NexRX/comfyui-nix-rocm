@@ -390,6 +390,11 @@ let
               done
             fi
 
+            if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI_Comfyroll_CustomNodes" ]]; then
+                cp -r "${customNodes.comfyui_comfyroll_customnodes}" "$BASE_DIR/custom_nodes/ComfyUI_Comfyroll_CustomNodes"
+                chmod -R 777 "$BASE_DIR/custom_nodes/ComfyUI_Comfyroll_CustomNodes"
+            fi
+
             # Create fonts directory with bundled fonts for custom nodes
             # This provides fonts for nodes like ComfyUI_Comfyroll_CustomNodes that expect
             # fonts at hardcoded paths like /usr/share/fonts/truetype (which doesn't exist on NixOS)
@@ -514,8 +519,8 @@ let
             if [[ ! -e "$BASE_DIR/custom_nodes/ComfyLiterals" ]]; then
                 ln -sf "${customNodes.comfyliterals}" "$BASE_DIR/custom_nodes/ComfyLiterals"
             fi
-            if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI_Comfyroll_CustomNodes" ]]; then
-                ln -sf "${customNodes.comfyui_comfyroll_customnodes}" "$BASE_DIR/custom_nodes/ComfyUI_Comfyroll_CustomNodes"
+            if [[ ! -e "$BASE_DIR/custom_nodes/IntelligentVRAMNode" ]]; then
+                ln -sf "${customNodes.intelligentvramnode}" "$BASE_DIR/custom_nodes/IntelligentVRAMNode"
             fi
 
             # Create default ComfyUI-Manager config if it doesn't exist
