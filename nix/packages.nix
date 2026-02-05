@@ -514,6 +514,9 @@ let
             if [[ ! -e "$BASE_DIR/custom_nodes/ComfyLiterals" ]]; then
                 ln -sf "${customNodes.comfyliterals}" "$BASE_DIR/custom_nodes/ComfyLiterals"
             fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI_Comfyroll_CustomNodes" ]]; then
+                ln -sf "${customNodes.comfyui_comfyroll_customnodes}" "$BASE_DIR/custom_nodes/ComfyUI_Comfyroll_CustomNodes"
+            fi
 
             # Create default ComfyUI-Manager config if it doesn't exist
             # Note: Manager moved config from user/default/ComfyUI-Manager to user/__manager

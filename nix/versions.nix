@@ -298,5 +298,13 @@
       rev = "bdddb08ca82d90d75d97b1d437a652e0284a32ac";
       hash = "sha256-4sP87Ntm5mrNcvKhbUjLVIsVtch/oMLAoGR1OCSfAaM=";
     };
+
+    comfyui_comfyroll_customnodes = {
+      version = "2026-02-05";
+      owner = "Suzie1";
+      repo = "ComfyUI_Comfyroll_CustomNodes";
+      rev = "d78b780ae43fcf8c6b7c6505e6ffb4584281ceca";
+      hash = "sha256-+qhDJ9hawSEg9AGBz8w+UzohMFhgZDOzvenw8xVVyPc=";
+    };
   };
 }

@@ -811,6 +811,40 @@ let
     };
   };
 
+  # comfyui_comfyroll_customnodes
+  comfyui_comfyroll_customnodes = pkgs.stdenv.mkDerivation {
+    pname = "comfyui_comfyroll_customnodes";
+    version = versions.customNodes.comfyui_comfyroll_customnodes.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.comfyui_comfyroll_customnodes.owner;
+      repo = versions.customNodes.comfyui_comfyroll_customnodes.repo;
+      rev = versions.customNodes.comfyui_comfyroll_customnodes.rev;
+      hash = versions.customNodes.comfyui_comfyroll_customnodes.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    # Python dependencies required
+    passthru.pythonDeps =
+      ps: with ps; [
+      ];
+
+    meta = with lib; {
+      description = "ComfyUI_Comfyroll_CustomNodes";
+      homepage = "https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes";
+      license = licenses.gpl3;
+    };
+  };
+
 in
 {
   inherit
@@ -834,5 +868,6 @@ in
     comfyui-logic
     comfyui_essentials_mb
     comfyliterals
+    comfyui_comfyroll_customnodes
     ;
 }
