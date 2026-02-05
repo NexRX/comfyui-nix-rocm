@@ -9,7 +9,14 @@ let
 
   # Determine which package to use based on configuration
   # CUDA package uses pre-built wheels supporting all GPU architectures (Pascal through Hopper)
-  resolvePackage = if cfg.cuda then pkgs.comfy-ui-cuda else pkgs.comfy-ui;
+  # ROCm package uses pre-built wheels supporting AMD Radeon RX 6000/7000 series
+  resolvePackage =
+    if cfg.cuda then
+      pkgs.comfy-ui-cuda
+    else if cfg.rocm then
+      pkgs.comfy-ui-rocm
+    else
+      pkgs.comfy-ui;
   args = [
     "--listen"
     cfg.listenAddress
@@ -78,6 +85,23 @@ in
         When enabled, uses pre-built PyTorch CUDA wheels that support all GPU
         architectures from Pascal (GTX 1080) through Hopper (H100) in a single package.
         Requires NVIDIA drivers to be installed on the system.
+
+        Mutually exclusive with rocm option.
+      '';
+    };
+
+    rocm = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Enable ROCm support for AMD GPUs. This is recommended for users
+        with AMD Radeon graphics cards as it provides significant performance improvements.
+
+        When enabled, uses pre-built PyTorch ROCm wheels that support AMD Radeon
+        RX 6000 and 7000 series GPUs with ROCm 7.1 libraries bundled.
+        Requires ROCm drivers to be installed on the system.
+
+        Mutually exclusive with cuda option.
       '';
     };
 
@@ -124,11 +148,14 @@ in
       type = lib.types.package;
       default = resolvePackage;
       defaultText = lib.literalExpression ''
-        if cuda then pkgs.comfy-ui-cuda else pkgs.comfy-ui
+        if cuda then pkgs.comfy-ui-cuda
+        else if rocm then pkgs.comfy-ui-rocm
+        else pkgs.comfy-ui
       '';
       description = ''
-        ComfyUI package to run. Automatically set based on CUDA configuration:
-        - `cuda = true`: CUDA package (supports all GPU architectures)
+        ComfyUI package to run. Automatically set based on GPU configuration:
+        - `cuda = true`: CUDA package (supports all NVIDIA GPU architectures)
+        - `rocm = true`: ROCm package (supports AMD Radeon RX 6000/7000 series)
         - Otherwise: CPU-only build
 
         Can be overridden for fully custom builds.
@@ -243,6 +270,13 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = !(cfg.cuda && cfg.rocm);
+        message = "services.comfyui: cuda and rocm options are mutually exclusive. Please enable only one.";
+      }
+    ];
+
     nixpkgs.config = lib.mkIf (cfg.cudaCapabilities != null) {
       cudaCapabilities = cfg.cudaCapabilities;
     };

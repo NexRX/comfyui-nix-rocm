@@ -4,8 +4,12 @@
   versions,
   pythonOverrides,
   cudaSupport ? false,
+  rocmSupport ? false,
 }:
 let
+  useCuda = cudaSupport && !rocmSupport;
+  useRocm = rocmSupport;
+
   python = pkgs.python312.override { packageOverrides = pythonOverrides; };
 
   vendored = import ./vendored-packages.nix { inherit pkgs python versions; };
@@ -98,11 +102,16 @@ let
     network_mode = personal_cloud
   '';
 
-  pythonRuntime = python.withPackages (
+  # Build base Python environment
+  pythonRuntimeBase = python.withPackages (
     ps:
     let
       available = pkg: lib.meta.availableOn pkgs.stdenv.hostPlatform pkg;
-      # Core ComfyUI dependencies
+      # Core ComfyUI dependencies (including torch explicitly at the top)
+      torchPackages =
+        lib.optionals (ps ? torch) [ ps.torch ]
+        ++ lib.optionals (ps ? torchvision) [ ps.torchvision ]
+        ++ lib.optionals (ps ? torchaudio) [ ps.torchaudio ];
       base = with ps; [
         pillow
         numpy
@@ -167,14 +176,8 @@ let
           onnxruntime # ONNX runtime
         ]
         ++ [ ps."color-matcher" ]; # Color matching (hyphenated name needs quoting)
-      # torch is overridden at the base level in python-overrides.nix when cudaSupport=true
-      # so ps.torch is already CUDA-enabled when building with CUDA support
-      torchPackages = lib.optionals (ps ? torch && available ps.torch) [ ps.torch ];
       optionals =
-        torchPackages
-        ++ lib.optionals (ps ? torchvision && available ps.torchvision) [ ps.torchvision ]
-        ++ lib.optionals (ps ? torchaudio && available ps.torchaudio) [ ps.torchaudio ]
-        ++ lib.optionals (ps ? torchsde && available ps.torchsde) [ ps.torchsde ]
+        lib.optionals (ps ? torchsde && available ps.torchsde) [ ps.torchsde ]
         # kornia excluded on macOS and aarch64-linux: kornia-rs has Cargo/badPlatforms issues
         # See: https://github.com/NixOS/nixpkgs/issues/458799
         ++ lib.optionals (
@@ -188,7 +191,10 @@ let
         ++ lib.optionals (ps ? "comfy-cli" && available ps."comfy-cli") [ ps."comfy-cli" ]
         # Linux-only packages (CUDA dependencies)
         ++ lib.optionals (pkgs.stdenv.isLinux && ps ? bitsandbytes) [ ps.bitsandbytes ]
-        ++ lib.optionals (pkgs.stdenv.isLinux && ps ? xformers) [ ps.xformers ]
+        # xformers requires torch at build time during compilation, skip for ROCm builds
+        # ROCm would need to recompile xformers from source which is complex and time-consuming
+        # xformers is optional - ComfyUI works without it (slower but functional)
+        ++ lib.optionals (pkgs.stdenv.isLinux && !useRocm && ps ? xformers) [ ps.xformers ]
         # Face analysis packages - work on all platforms (insightface override removes mxnet)
         ++ lib.optionals (ps ? insightface) [ ps.insightface ]
         ++ lib.optionals (ps ? facexlib) [ ps.facexlib ]
@@ -199,10 +205,34 @@ let
           vendored.comfyuiManager
         ];
     in
-    base ++ extras ++ optionals
+    torchPackages ++ base ++ extras ++ optionals
   );
 
-  frontendRoot = "${pythonRuntime}/${python.sitePackages}/comfyui_frontend_package/static";
+  # Force torch into the Python environment using symlinkJoin
+  # This works around a Nix Python infrastructure issue where torch is silently excluded
+  pythonRuntime = pkgs.symlinkJoin {
+    name = "python3-3.12.12-env-with-torch";
+    paths = [
+      pythonRuntimeBase
+      python.pkgs.torch
+      python.pkgs.torchvision
+      python.pkgs.torchaudio
+    ];
+    postBuild = ''
+      # Ensure torch is in site-packages
+      if [ -d "${python.pkgs.torch}/${python.sitePackages}" ]; then
+        ln -sf ${python.pkgs.torch}/${python.sitePackages}/* $out/${python.sitePackages}/ 2>/dev/null || true
+      fi
+      if [ -d "${python.pkgs.torchvision}/${python.sitePackages}" ]; then
+        ln -sf ${python.pkgs.torchvision}/${python.sitePackages}/* $out/${python.sitePackages}/ 2>/dev/null || true
+      fi
+      if [ -d "${python.pkgs.torchaudio}/${python.sitePackages}" ]; then
+        ln -sf ${python.pkgs.torchaudio}/${python.sitePackages}/* $out/${python.sitePackages}/ 2>/dev/null || true
+      fi
+    '';
+  };
+
+  frontendRoot = "${pythonRuntimeBase}/${python.sitePackages}/comfyui_frontend_package/static";
 
   libPath = lib.makeLibraryPath [
     pkgs.stdenv.cc.cc.lib
@@ -235,6 +265,28 @@ let
         if [[ -d "/run/opengl-driver/lib" ]]; then
           export LD_LIBRARY_PATH="/run/opengl-driver/lib:$LD_LIBRARY_PATH"
         fi
+
+        # Add ROCm libraries if using ROCm support
+        ${lib.optionalString useRocm ''
+          # PyTorch ROCm wheels bundle ROCm 7.1 libraries internally
+          # Add the torch lib directory to LD_LIBRARY_PATH so torchaudio can find them
+          export LD_LIBRARY_PATH="${pythonRuntime}/lib/python3.12/site-packages/torch/lib:$LD_LIBRARY_PATH"
+
+          # Also add system ROCm libraries (for compatibility with other packages)
+          export LD_LIBRARY_PATH="${
+            lib.makeLibraryPath (
+              with pkgs.rocmPackages;
+              [
+                clr
+                rocm-core
+                hipblas
+                miopen
+                rocblas
+                rocsolver
+              ]
+            )
+          }:$LD_LIBRARY_PATH"
+        ''}
       '';
 
   # Platform-specific browser command
@@ -573,12 +625,25 @@ let
       "com.nvidia.volumes.needed" = "nvidia_driver";
     };
   };
+
+  dockerImageRocm = dockerLib.mkDockerImage {
+    name = "comfy-ui";
+    tag = "rocm";
+    comfyUiPackage = comfyUiPackage;
+    rocmSupport = true;
+    rocmVersion = "rocm7.1";
+    extraLabels = {
+      "org.opencontainers.image.version" = versions.comfyui.version;
+      "com.amd.volumes.needed" = "rocm_driver";
+    };
+  };
 in
 {
   default = comfyUiPackage;
   inherit
     dockerImage
     dockerImageCuda
+    dockerImageRocm
     pythonRuntime
     comfyuiSrc
     modelDownloaderDir

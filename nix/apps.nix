@@ -53,6 +53,15 @@ in
     };
   };
 }
+// pkgs.lib.optionalAttrs (packages ? rocm) {
+  rocm = {
+    type = "app";
+    program = "${packages.rocm}/bin/comfy-ui";
+    meta = {
+      description = "Run ComfyUI with ROCm (AMD GPU support)";
+    };
+  };
+}
 # Architecture-specific CUDA apps - Consumer GPUs
 // pkgs.lib.optionalAttrs (packages ? cuda-sm61) {
   cuda-sm61 = {
@@ -136,6 +145,16 @@ in
     echo "Note: Requires nvidia-container-toolkit and Docker GPU support."
   '' [ pkgs.docker ];
 }
+// pkgs.lib.optionalAttrs (packages ? dockerImageRocm) {
+  buildDockerRocm = mkApp "build-docker-rocm" "Build ComfyUI Docker image with ROCm support" ''
+    echo "Building Docker image for ComfyUI with ROCm support..."
+    docker load < ${packages.dockerImageRocm}
+    echo "ROCm-enabled Docker image built successfully! You can now run it with:"
+    echo "docker run --device=/dev/kfd --device=/dev/dri -p 8188:8188 -v \$PWD/data:/data comfy-ui:rocm"
+    echo ""
+    echo "Note: Requires ROCm drivers and Docker support for AMD GPUs."
+  '' [ pkgs.docker ];
+}
 # Cross-platform Docker build apps (always available, use remote builder on non-Linux)
 // pkgs.lib.optionalAttrs (packages ? dockerImageLinux) {
   buildDockerLinux = mkApp "build-docker-linux" "Build ComfyUI Docker image for Linux x86_64 (CPU)" ''
@@ -157,6 +176,20 @@ in
         echo "docker run --gpus all -p 8188:8188 -v \$PWD/data:/data comfy-ui:cuda"
         echo ""
         echo "Note: Requires nvidia-container-toolkit and Docker GPU support."
+      ''
+      [ pkgs.docker ];
+}
+// pkgs.lib.optionalAttrs (packages ? dockerImageLinuxRocm) {
+  buildDockerLinuxRocm =
+    mkApp "build-docker-linux-rocm" "Build ComfyUI Docker image for Linux x86_64 with ROCm"
+      ''
+        echo "Building Linux x86_64 Docker image for ComfyUI with ROCm support..."
+        echo "Note: Uses remote builder if running on non-Linux system"
+        docker load < ${packages.dockerImageLinuxRocm}
+        echo "ROCm-enabled Docker image built successfully! You can now run it with:"
+        echo "docker run --device=/dev/kfd --device=/dev/dri -p 8188:8188 -v \$PWD/data:/data comfy-ui:rocm"
+        echo ""
+        echo "Note: Requires ROCm drivers and Docker support for AMD GPUs."
       ''
       [ pkgs.docker ];
 }

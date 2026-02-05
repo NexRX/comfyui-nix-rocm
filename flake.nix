@@ -82,16 +82,24 @@
           };
 
           pythonOverridesFor =
-            pkgs: cudaSupport: import ./nix/python-overrides.nix { inherit pkgs versions cudaSupport; };
+            pkgs: cudaSupport: rocmSupport:
+            import ./nix/python-overrides.nix {
+              inherit
+                pkgs
+                versions
+                cudaSupport
+                rocmSupport
+                ;
+            };
 
           mkPython =
-            pkgs: cudaSupport:
-            pkgs.python312.override { packageOverrides = pythonOverridesFor pkgs cudaSupport; };
+            pkgs: cudaSupport: rocmSupport:
+            pkgs.python312.override { packageOverrides = pythonOverridesFor pkgs cudaSupport rocmSupport; };
 
           mkPythonEnv =
             pkgs:
             let
-              python = mkPython pkgs false;
+              python = mkPython pkgs false false;
             in
             python.withPackages (ps: [
               ps.setuptools
@@ -103,26 +111,32 @@
             pkgs:
             {
               cudaSupport ? false,
+              rocmSupport ? false,
             }:
             import ./nix/packages.nix {
               inherit
                 pkgs
                 versions
                 cudaSupport
+                rocmSupport
                 ;
               lib = pkgs.lib;
-              pythonOverrides = pythonOverridesFor pkgs cudaSupport;
+              pythonOverrides = pythonOverridesFor pkgs cudaSupport rocmSupport;
             };
 
           # Linux packages for Docker image cross-builds
           linuxX86Packages = mkComfyPackages pkgsLinuxX86 { };
           # Docker CUDA images use pre-built wheels (all architectures supported)
           linuxX86PackagesCuda = mkComfyPackages pkgsLinuxX86 { cudaSupport = true; };
+          # Docker ROCm images use pre-built wheels (AMD GPU support)
+          linuxX86PackagesRocm = mkComfyPackages pkgsLinuxX86 { rocmSupport = true; };
           linuxArm64Packages = mkComfyPackages pkgsLinuxArm64 { };
 
           nativePackages = mkComfyPackages pkgs { };
           # CUDA uses pre-built wheels (supports all GPU architectures)
           nativePackagesCuda = mkComfyPackages pkgs { cudaSupport = true; };
+          # ROCm uses pre-built wheels (AMD GPU support)
+          nativePackagesRocm = mkComfyPackages pkgs { rocmSupport = true; };
 
           pythonEnv = mkPythonEnv pkgs;
 
@@ -130,7 +144,7 @@
           customNodes = import ./nix/custom-nodes.nix {
             inherit pkgs versions;
             lib = pkgs.lib;
-            python = mkPython pkgs false;
+            python = mkPython pkgs false false;
           };
 
           source = pkgs.lib.cleanSourceWith {
@@ -174,6 +188,7 @@
             # These are always available regardless of host system
             dockerImageLinux = linuxX86Packages.dockerImage;
             dockerImageLinuxCuda = linuxX86PackagesCuda.dockerImageCuda;
+            dockerImageLinuxRocm = linuxX86PackagesRocm.dockerImageRocm;
             dockerImageLinuxArm64 = linuxArm64Packages.dockerImage;
           }
           // pkgs.lib.optionalAttrs pkgs.stdenv.isLinux {
@@ -183,6 +198,9 @@
             # CUDA package uses pre-built wheels (supports all GPU architectures)
             cuda = nativePackagesCuda.default;
             dockerImageCuda = nativePackagesCuda.dockerImageCuda;
+            # ROCm package uses pre-built wheels (AMD GPU support)
+            rocm = nativePackagesRocm.default;
+            dockerImageRocm = nativePackagesRocm.dockerImageRocm;
           };
 
           # Expose custom nodes for direct use
@@ -255,6 +273,12 @@
               self.packages.${final.system}.cuda
             else
               throw "comfy-ui-cuda is only available on x86_64 Linux";
+          # ROCm variant (x86_64 Linux only) - uses pre-built wheels for AMD GPU support
+          comfy-ui-rocm =
+            if final.stdenv.isLinux && final.stdenv.isx86_64 then
+              self.packages.${final.system}.rocm
+            else
+              throw "comfy-ui-rocm is only available on x86_64 Linux";
           # Add custom nodes to overlay
           comfyui-custom-nodes = self.legacyPackages.${final.system}.customNodes;
         };

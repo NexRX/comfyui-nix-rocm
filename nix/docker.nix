@@ -10,7 +10,9 @@
       tag,
       comfyUiPackage,
       cudaSupport ? false,
+      rocmSupport ? false,
       cudaVersion ? "cu124",
+      rocmVersion ? "rocm7.1",
       extraLabels ? { },
     }:
     let
@@ -27,11 +29,17 @@
         "NVIDIA_VISIBLE_DEVICES=all"
         "NVIDIA_DRIVER_CAPABILITIES=compute,utility"
       ];
+      rocmEnv = lib.optionals rocmSupport [
+        "HSA_OVERRIDE_GFX_VERSION=10.3.0"
+        "ROCR_VISIBLE_DEVICES=0"
+      ];
       labels = {
         "org.opencontainers.image.title" = if cudaSupport then "ComfyUI CUDA" else "ComfyUI";
         "org.opencontainers.image.description" =
           if cudaSupport then
-            "ComfyUI with CUDA support for GPU acceleration"
+            "ComfyUI with CUDA support for NVIDIA GPU acceleration"
+          else if rocmSupport then
+            "ComfyUI with ROCm support for AMD GPU acceleration"
           else
             "ComfyUI - The most powerful and modular diffusion model GUI";
         "org.opencontainers.image.source" = "https://github.com/utensils/comfyui-nix";
@@ -73,8 +81,8 @@
           "--listen"
           "0.0.0.0"
         ]
-        ++ lib.optionals (!cudaSupport) [ "--cpu" ];
-        Env = baseEnv ++ cudaEnv;
+        ++ lib.optionals (!cudaSupport && !rocmSupport) [ "--cpu" ];
+        Env = baseEnv ++ cudaEnv ++ rocmEnv;
         ExposedPorts = {
           "8188/tcp" = { };
         };

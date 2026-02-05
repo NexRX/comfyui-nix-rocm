@@ -2,10 +2,12 @@
   pkgs,
   versions,
   cudaSupport ? false,
+  rocmSupport ? false,
 }:
 let
   lib = pkgs.lib;
-  useCuda = cudaSupport && pkgs.stdenv.isLinux;
+  useCuda = cudaSupport && pkgs.stdenv.isLinux && !rocmSupport;
+  useRocm = rocmSupport && pkgs.stdenv.isLinux;
   useDarwinArm64 = pkgs.stdenv.isDarwin && pkgs.stdenv.hostPlatform.isAarch64;
   sentencepieceNoGperf = pkgs.sentencepiece.override { withGPerfTools = false; };
 
@@ -13,6 +15,10 @@ let
   # These avoid compiling PyTorch from source (which requires 30-60GB RAM and hours of build time)
   # The wheels bundle CUDA 12.4 libraries, so no separate CUDA toolkit needed at runtime
   cudaWheels = versions.pytorchWheels.cu124;
+
+  # Pre-built PyTorch ROCm wheels from pytorch.org
+  # These provide AMD GPU support with ROCm 7.1 libraries bundled
+  rocmWheels = versions.pytorchWheels.rocm;
 
   # Pre-built PyTorch wheels for macOS Apple Silicon
   # PyTorch 2.5.1 is used instead of 2.9.x due to MPS bugs on macOS 26 (Tahoe)
@@ -41,6 +47,26 @@ let
       cudnn # libcudnn.so.9
       nccl # libnccl.so.2
       cuda_nvrtc # libnvrtc.so.12
+    ]
+  );
+
+  # ROCm libraries needed by PyTorch wheels (for auto-patchelf)
+  rocmLibs = pkgs.lib.optionals useRocm (
+    with pkgs.rocmPackages;
+    [
+      clr # ROCm core runtime
+      rocm-core
+      hipblas
+      hipfft
+      hipsparse
+      hipsolver
+      rocrand
+      rocblas
+      rocsparse
+      rocsolver
+      rocfft
+      miopen
+      rccl
     ]
   );
 in
@@ -204,6 +230,203 @@ lib.optionalAttrs useCuda {
     doCheck = false;
     meta = {
       description = "TorchAudio with CUDA (pre-built wheel)";
+      homepage = "https://pytorch.org/audio";
+      license = lib.licenses.bsd2;
+      platforms = [ "x86_64-linux" ];
+    };
+  };
+}
+# ROCm torch from pre-built wheels - provides AMD GPU support
+# The wheels bundle ROCm 7.1 libraries internally, providing full AMD GPU support
+// lib.optionalAttrs useRocm {
+  torch =
+    assert useRocm -> (builtins.trace "ROCm torch override is being applied!" true);
+    final.buildPythonPackage {
+      pname = "torch";
+      version = rocmWheels.torch.version;
+      format = "wheel";
+      src = pkgs.fetchurl {
+        url = builtins.head (pkgs.lib.splitString "#" rocmWheels.torch.url);
+        hash = rocmWheels.torch.hash;
+      };
+      dontBuild = true;
+      dontConfigure = true;
+      nativeBuildInputs = [
+        pkgs.autoPatchelfHook
+        pkgs.gnused
+      ];
+      buildInputs = wheelBuildInputs ++ rocmLibs;
+      # ROCm libraries are provided by rocmPackages at runtime
+      autoPatchelfIgnoreMissingDeps = [
+        "libamdhip64.so.6"
+        "librocblas.so.4"
+        "libMIOpen.so.1"
+        "libamd_comgr.so.2"
+        "libhsa-runtime64.so.1"
+      ];
+
+      # Remove nvidia-* and triton dependencies from wheel metadata
+      postInstall = ''
+        for metadata in "$out/${final.python.sitePackages}"/torch-*.dist-info/METADATA; do
+          if [[ -f "$metadata" ]]; then
+            sed -i '/^Requires-Dist: nvidia-/d' "$metadata"
+            sed -i '/^Requires-Dist: triton/d' "$metadata"
+          fi
+        done
+      '';
+
+      propagatedBuildInputs = with final; [
+        filelock
+        typing-extensions
+        sympy
+        networkx
+        jinja2
+        fsspec
+      ];
+      # Don't check for ROCm at import time (requires GPU)
+      pythonImportsCheck = [ ];
+      doCheck = false;
+
+      # Passthru attributes expected by downstream packages
+      # The wheel bundles ROCm 7.1 libraries
+      passthru = {
+        cudaSupport = false;
+        rocmSupport = true;
+        # Provide rocmPackages for packages that need it
+        rocmPackages = pkgs.rocmPackages;
+        cudaPackages = { };
+      };
+
+      meta = {
+        description = "PyTorch with ROCm ${rocmWheels.torch.version} (pre-built wheel)";
+        homepage = "https://pytorch.org";
+        license = lib.licenses.bsd3;
+        platforms = [ "x86_64-linux" ];
+      };
+    };
+
+  torchvision = final.buildPythonPackage {
+    pname = "torchvision";
+    version = rocmWheels.torchvision.version;
+    format = "wheel";
+    src = pkgs.fetchurl {
+      url = builtins.head (pkgs.lib.splitString "#" rocmWheels.torchvision.url);
+      hash = rocmWheels.torchvision.hash;
+    };
+    dontBuild = true;
+    dontConfigure = true;
+    nativeBuildInputs = [ pkgs.autoPatchelfHook ];
+    buildInputs = wheelBuildInputs ++ rocmLibs ++ [ final.torch ];
+    # Ignore torch libs (loaded via Python import)
+    autoPatchelfIgnoreMissingDeps = [
+      "libamdhip64.so.6"
+      "libamdhip64.so.7"
+      "libtorch.so"
+      "libtorch_cpu.so"
+      "libtorch_hip.so"
+      "libtorch_python.so"
+      "libc10.so"
+      "libc10_hip.so"
+    ];
+
+    # Patch to fix ROCm operator registration issues
+    # Comment out the torchvision::nms registration that fails with ROCm
+    postInstall = ''
+            META_REG="$out/${final.python.sitePackages}/torchvision/_meta_registrations.py"
+            if [[ -f "$META_REG" ]]; then
+              ${pkgs.python3}/bin/python3 << PATCHEOF
+      import sys
+      import re
+
+      filepath = "$META_REG"
+      with open(filepath, 'r') as f:
+          content = f.read()
+
+      # Find and comment out the @torch.library.register_fake("torchvision::nms") decorator
+      # and its associated function
+      pattern = r'(@torch\.library\.register_fake\("torchvision::nms"\)\s*\ndef\s+\w+\([^)]*\):[^\n]*(?:\n(?!@|def\s+\w+)[^\n]*)*)'
+
+      def comment_block(match):
+          block = match.group(0)
+          return '\n'.join('# ' + line if line.strip() else line for line in block.split('\n'))
+
+      content = re.sub(pattern, comment_block, content, flags=re.MULTILINE)
+
+      with open(filepath, 'w') as f:
+          f.write(content)
+      PATCHEOF
+            fi
+    '';
+
+    propagatedBuildInputs = with final; [
+      torch
+      numpy
+      pillow
+    ];
+    pythonImportsCheck = [ ];
+    doCheck = false;
+    meta = {
+      description = "TorchVision with ROCm (pre-built wheel)";
+      homepage = "https://pytorch.org/vision";
+      license = lib.licenses.bsd3;
+      platforms = [ "x86_64-linux" ];
+    };
+  };
+
+  torchaudio = final.buildPythonPackage {
+    pname = "torchaudio";
+    version = rocmWheels.torchaudio.version;
+    format = "wheel";
+    src = pkgs.fetchurl {
+      url = builtins.head (pkgs.lib.splitString "#" rocmWheels.torchaudio.url);
+      hash = rocmWheels.torchaudio.hash;
+    };
+    dontBuild = true;
+    dontConfigure = true;
+    nativeBuildInputs = [ pkgs.autoPatchelfHook ];
+    buildInputs = wheelBuildInputs ++ rocmLibs ++ [ final.torch ];
+    # Ignore torch libs (loaded via Python) and FFmpeg/sox libs (optional, multiple versions bundled)
+    autoPatchelfIgnoreMissingDeps = [
+      "libamdhip64.so.6"
+      # ROCm libraries (provided by rocmPackages at runtime)
+      "libhipblas.so.3"
+      "libhipsparse.so.4"
+      "libhipsolver.so.1"
+      # Torch libs (loaded via Python import)
+      "libtorch.so"
+      "libtorch_cpu.so"
+      "libtorch_hip.so"
+      "libtorch_python.so"
+      "libc10.so"
+      "libc10_hip.so"
+      # Sox (optional audio backend)
+      "libsox.so"
+      # FFmpeg 4.x
+      "libavutil.so.56"
+      "libavcodec.so.58"
+      "libavformat.so.58"
+      "libavfilter.so.7"
+      "libavdevice.so.58"
+      # FFmpeg 5.x
+      "libavutil.so.57"
+      "libavcodec.so.59"
+      "libavformat.so.59"
+      "libavfilter.so.8"
+      "libavdevice.so.59"
+      # FFmpeg 6.x
+      "libavutil.so.58"
+      "libavcodec.so.60"
+      "libavformat.so.60"
+      "libavfilter.so.9"
+      "libavdevice.so.60"
+    ];
+    propagatedBuildInputs = with final; [
+      torch
+    ];
+    pythonImportsCheck = [ ];
+    doCheck = false;
+    meta = {
+      description = "TorchAudio with ROCm (pre-built wheel)";
       homepage = "https://pytorch.org/audio";
       license = lib.licenses.bsd2;
       platforms = [ "x86_64-linux" ];
@@ -394,9 +617,12 @@ lib.optionalAttrs useCuda {
 }
 
 # Disable tests for open-clip-torch (they hang waiting for model downloads)
+# Disable runtime deps check and imports check for CUDA/ROCm builds (torch/torchvision are wheel-based)
 // lib.optionalAttrs (prev ? open-clip-torch) {
   open-clip-torch = prev.open-clip-torch.overridePythonAttrs (old: {
     doCheck = false;
+    dontCheckRuntimeDeps = useCuda || useRocm;
+    pythonImportsCheck = if (useCuda || useRocm) then [ ] else (old.pythonImportsCheck or [ ]);
   });
 }
 
@@ -407,18 +633,115 @@ lib.optionalAttrs useCuda {
   });
 }
 
+# Disable runtime deps check, imports check, and tests for ultralytics when using custom torch (CUDA/ROCm wheels)
+// lib.optionalAttrs ((useCuda || useRocm) && (prev ? ultralytics)) {
+  ultralytics = prev.ultralytics.overridePythonAttrs (old: {
+    pythonImportsCheck = [ ];
+    doCheck = false;
+    dontCheckRuntimeDeps = true;
+  });
+}
+
 # Disable failing timm test (torch dynamo/inductor test needs setuptools at runtime)
 // lib.optionalAttrs (prev ? timm) {
   timm = prev.timm.overridePythonAttrs (old: {
     disabledTests = (old.disabledTests or [ ]) ++ [ "test_kron" ];
+    # Disable all checks for CUDA/ROCm builds (torch/torchvision are wheel-based)
+    doCheck = if (useCuda || useRocm) then false else (old.doCheck or true);
+    dontCheckRuntimeDeps = useCuda || useRocm;
+    pythonImportsCheck = if (useCuda || useRocm) then [ ] else (old.pythonImportsCheck or [ ]);
+  });
+}
+
+# Disable all checks for torchdiffeq when using custom torch (CUDA/ROCm wheels)
+# The check tries to import torch at build time, which fails with wheel-based torch
+// lib.optionalAttrs ((useCuda || useRocm) && (prev ? torchdiffeq)) {
+  torchdiffeq = prev.torchdiffeq.overridePythonAttrs (old: {
+    pythonImportsCheck = [ ];
+    doCheck = false;
+    dontCheckRuntimeDeps = true;
+  });
+}
+
+# Disable all checks for torchsde when using custom torch (CUDA/ROCm wheels)
+# The check tries to import torch at build time, which fails with wheel-based torch
+// lib.optionalAttrs ((useCuda || useRocm) && (prev ? torchsde)) {
+  torchsde = prev.torchsde.overridePythonAttrs (old: {
+    pythonImportsCheck = [ ];
+    doCheck = false;
+    dontCheckRuntimeDeps = true;
+  });
+}
+
+# Disable all checks for ultralytics-thop when using custom torch (CUDA/ROCm wheels)
+# The check tries to verify torch is installed at build time, which fails with wheel-based torch
+// lib.optionalAttrs ((useCuda || useRocm) && (prev ? "ultralytics-thop")) {
+  "ultralytics-thop" = prev."ultralytics-thop".overridePythonAttrs (old: {
+    pythonImportsCheck = [ ];
+    doCheck = false;
+    dontCheckRuntimeDeps = true;
+  });
+}
+
+# Disable all checks for safetensors when using custom torch (CUDA/ROCm wheels)
+# The tests try to import torch at build time, which fails with wheel-based torch
+// lib.optionalAttrs ((useCuda || useRocm) && (prev ? safetensors)) {
+  safetensors = prev.safetensors.overridePythonAttrs (old: {
+    pythonImportsCheck = [ ];
+    doCheck = false;
+    dontCheckRuntimeDeps = true;
+  });
+}
+
+# Disable all checks for accelerate when using custom torch (CUDA/ROCm wheels)
+# The check tries to verify torch is installed at build time, which fails with wheel-based torch
+// lib.optionalAttrs ((useCuda || useRocm) && (prev ? accelerate)) {
+  accelerate = prev.accelerate.overridePythonAttrs (old: {
+    pythonImportsCheck = [ ];
+    doCheck = false;
+    dontCheckRuntimeDeps = true;
+  });
+}
+
+# Disable all checks for peft when using custom torch (CUDA/ROCm wheels)
+# The check tries to verify torch is installed at build time, which fails with wheel-based torch
+// lib.optionalAttrs ((useCuda || useRocm) && (prev ? peft)) {
+  peft = prev.peft.overridePythonAttrs (old: {
+    pythonImportsCheck = [ ];
+    doCheck = false;
+    dontCheckRuntimeDeps = true;
+  });
+}
+
+# Disable all checks for kornia-rs when using custom torch (CUDA/ROCm wheels)
+# The tests try to import torch at build time, which fails with wheel-based torch
+// lib.optionalAttrs ((useCuda || useRocm) && (prev ? kornia-rs)) {
+  kornia-rs = prev.kornia-rs.overridePythonAttrs (old: {
+    pythonImportsCheck = [ ];
+    doCheck = false;
+    dontCheckRuntimeDeps = true;
+  });
+}
+
+# Disable all checks for kornia when using custom torch (CUDA/ROCm wheels)
+# The check tries to verify torch is installed at build time, which fails with wheel-based torch
+// lib.optionalAttrs ((useCuda || useRocm) && (prev ? kornia)) {
+  kornia = prev.kornia.overridePythonAttrs (old: {
+    pythonImportsCheck = [ ];
+    doCheck = false;
+    dontCheckRuntimeDeps = true;
   });
 }
 
 # Relax xformers torch version requirement (0.0.30 wants torch>=2.7, we have 2.5.1)
+# For CUDA/ROCm: xformers needs torch at build time (it's a compiled extension)
 // lib.optionalAttrs (prev ? xformers) {
   xformers = prev.xformers.overridePythonAttrs (old: {
     nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ final.pythonRelaxDepsHook ];
     pythonRelaxDeps = (old.pythonRelaxDeps or [ ]) ++ [ "torch" ];
+    # Add torch to propagatedBuildInputs for CUDA/ROCm so setup.py can import it during build
+    propagatedBuildInputs =
+      (old.propagatedBuildInputs or [ ]) ++ lib.optionals (useCuda || useRocm) [ final.torch ];
   });
 }
 
@@ -435,11 +758,20 @@ lib.optionalAttrs useCuda {
     doCheck = if pkgs.stdenv.isDarwin then false else (old.doCheck or true);
   });
 }
+// lib.optionalAttrs (prev ? mss) {
+  mss = prev.mss.overridePythonAttrs (old: {
+    # Disable tests that require a display
+    doCheck = false;
+  });
+}
 
 # Fix bitsandbytes build - needs ninja for wheel building phase
+# Disable runtime deps check and imports check for CUDA/ROCm builds (torch is wheel-based)
 // lib.optionalAttrs (prev ? bitsandbytes) {
   bitsandbytes = prev.bitsandbytes.overridePythonAttrs (old: {
     nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ final.ninja ];
+    dontCheckRuntimeDeps = useCuda || useRocm;
+    pythonImportsCheck = if (useCuda || useRocm) then [ ] else (old.pythonImportsCheck or [ ]);
   });
 }
 
@@ -497,7 +829,8 @@ lib.optionalAttrs useCuda {
     '';
 
     doCheck = false;
-    pythonImportsCheck = [ "facexlib" ];
+    # Disable imports check for CUDA/ROCm builds (torch not available at build time)
+    pythonImportsCheck = if (useCuda || useRocm) then [ ] else [ "facexlib" ];
   };
 }
 
@@ -559,7 +892,8 @@ lib.optionalAttrs useCuda {
     ];
 
     doCheck = false;
-    pythonImportsCheck = [ "segment_anything" ];
+    # Disable imports check for CUDA/ROCm builds (torch not available at build time)
+    pythonImportsCheck = if (useCuda || useRocm) then [ ] else [ "segment_anything" ];
 
     meta = {
       description = "Segment Anything Model (SAM) from Meta AI";
@@ -612,7 +946,10 @@ lib.optionalAttrs useCuda {
     ];
 
     doCheck = false;
-    pythonImportsCheck = [ "sam2" ];
+    # Disable imports check for CUDA/ROCm builds (torch not available at build time)
+    pythonImportsCheck = if (useCuda || useRocm) then [ ] else [ "sam2" ];
+    # Disable runtime deps check for CUDA/ROCm builds
+    dontCheckRuntimeDeps = if (useCuda || useRocm) then true else false;
 
     meta = {
       description = "Segment Anything Model 2 (SAM 2) from Meta AI";

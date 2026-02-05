@@ -26,6 +26,14 @@ nix run github:utensils/comfyui-nix#cuda
 
 CUDA builds use pre-built PyTorch wheels from pytorch.org, so builds are fast (~2GB download) and support all GPU architectures from Pascal (GTX 1080) through Hopper (H100) in a single package.
 
+For ROCm (Linux/AMD):
+
+```bash
+nix run github:utensils/comfyui-nix#rocm
+```
+
+ROCm builds use pre-built PyTorch wheels from pytorch.org, so builds are fast (~2GB download) and support AMD Radeon RX 6000 and 7000 series GPUs with ROCm 7.1.
+
 ## Options
 
 All [ComfyUI CLI options] are supported. Common examples:
@@ -61,6 +69,21 @@ nix run github:utensils/comfyui-nix#cuda
 ```
 
 This single package works on any NVIDIA GPU from the past ~8 years.
+
+## ROCm GPU Support
+
+ROCm builds are available for Linux with AMD GPUs. The `#rocm` package uses pre-built PyTorch wheels from pytorch.org which:
+
+- **Fast builds**: Downloads ~2GB of pre-built wheels instead of compiling for hours
+- **Low memory**: No 30-60GB RAM requirement for compilation
+- **AMD GPU support**: Supports Radeon RX 6000 and 7000 series GPUs
+- **Bundled runtime**: ROCm 7.1 libraries included in wheels (no separate ROCm toolkit needed)
+
+```bash
+nix run github:utensils/comfyui-nix#rocm
+```
+
+This package works on modern AMD Radeon GPUs with ROCm support.
 
 ## Why a Nix Flake?
 
@@ -275,6 +298,7 @@ The overlay provides these packages:
 | -------------------- | ------------------------------------------------ |
 | `pkgs.comfy-ui`      | CPU + Apple Silicon (Metal) - use this for macOS |
 | `pkgs.comfy-ui-cuda` | NVIDIA GPUs (Linux only, all architectures)      |
+| `pkgs.comfy-ui-rocm` | AMD GPUs (Linux only, RX 6000/7000 series)       |
 
 > **Note:** On macOS with Apple Silicon, the base `comfy-ui` package automatically uses Metal for GPU acceleration. No separate CUDA package is needed.
 
@@ -288,6 +312,9 @@ nix profile add github:utensils/comfyui-nix
 
 # CUDA (Linux/NVIDIA only)
 nix profile add github:utensils/comfyui-nix#cuda
+
+# ROCm (Linux/AMD only)
+nix profile add github:utensils/comfyui-nix#rocm
 ```
 
 > **Note:** Profile installation is convenient for trying ComfyUI but isn't declarative. For reproducible setups, add the package to your NixOS/nix-darwin configuration instead.
@@ -302,6 +329,7 @@ nix profile add github:utensils/comfyui-nix#cuda
   services.comfyui = {
     enable = true;
     cuda = true;  # Enable NVIDIA GPU acceleration (recommended for most users)
+    # rocm = true;  # Or enable AMD GPU acceleration (mutually exclusive with cuda)
     # cudaCapabilities = [ "8.9" ];  # Optional: optimize system CUDA packages for RTX 40xx
     #   Note: Pre-built PyTorch wheels already support all GPU architectures
     enableManager = true;  # Enable the built-in ComfyUI Manager
@@ -321,6 +349,7 @@ nix profile add github:utensils/comfyui-nix#cuda
 | --------------- | -------------------- | ------------------------------------------------ |
 | `enable`        | `false`              | Enable the ComfyUI service                       |
 | `cuda`          | `false`              | Enable NVIDIA GPU acceleration                   |
+| `rocm`          | `false`              | Enable AMD GPU acceleration (mutually exclusive with cuda) |
 | `cudaCapabilities` | `null`           | Optional CUDA compute capability list            |
 | `enableManager` | `false`              | Enable the built-in ComfyUI Manager              |
 | `port`          | `8188`               | Port for the web interface                       |
@@ -347,7 +376,7 @@ To run ComfyUI with data in a user's home directory:
 ```nix
 services.comfyui = {
   enable = true;
-  cuda = true;
+  cuda = true;  # Or rocm = true for AMD GPUs
   dataDir = "/home/myuser/comfyui-data";
   user = "myuser";
   group = "users";
@@ -393,6 +422,10 @@ docker run -p 8188:8188 -v "$PWD/data:/data" ghcr.io/utensils/comfyui-nix:latest
 # CUDA (x86_64 only, requires nvidia-container-toolkit)
 # Supports ALL GPU architectures: Pascal, Volta, Turing, Ampere, Ada, Hopper
 docker run --gpus all -p 8188:8188 -v "$PWD/data:/data" ghcr.io/utensils/comfyui-nix:latest-cuda
+
+# ROCm (x86_64 only, requires ROCm drivers)
+# Supports AMD Radeon RX 6000 and 7000 series GPUs
+docker run --device=/dev/kfd --device=/dev/dri -p 8188:8188 -v "$PWD/data:/data" ghcr.io/utensils/comfyui-nix:latest-rocm
 ```
 
 **Podman:**
@@ -403,6 +436,9 @@ podman run -p 8188:8188 -v "$PWD/data:/data:Z" ghcr.io/utensils/comfyui-nix:late
 
 # CUDA (requires nvidia-container-toolkit and CDI configured)
 podman run --device nvidia.com/gpu=all -p 8188:8188 -v "$PWD/data:/data:Z" ghcr.io/utensils/comfyui-nix:latest-cuda
+
+# ROCm (requires ROCm drivers)
+podman run --device=/dev/kfd --device=/dev/dri -p 8188:8188 -v "$PWD/data:/data:Z" ghcr.io/utensils/comfyui-nix:latest-rocm
 ```
 
 **Passing additional arguments:**
