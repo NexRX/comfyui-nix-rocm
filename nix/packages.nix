@@ -468,6 +468,7 @@ let
             fi
             if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI-Easy-Use" ]]; then
               cp -r "${customNodes.comfyui-easy-use}" "$BASE_DIR/custom_nodes/ComfyUI-Easy-Use"
+              chmod -R 777 "$BASE_DIR/custom_nodes/ComfyUI-Easy-Use"
             fi
             if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI-Lora-Manager" ]]; then
               ln -sf "${customNodes.comfyui-lora-manager}" "$BASE_DIR/custom_nodes/ComfyUI-Lora-Manager"
