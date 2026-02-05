@@ -777,6 +777,40 @@ let
     };
   };
 
+  # comfyliterals
+  comfyliterals = pkgs.stdenv.mkDerivation {
+    pname = "comfyliterals";
+    version = versions.customNodes.comfyliterals.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.comfyliterals.owner;
+      repo = versions.customNodes.comfyliterals.repo;
+      rev = versions.customNodes.comfyliterals.rev;
+      hash = versions.customNodes.comfyliterals.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    # Python dependencies required
+    passthru.pythonDeps =
+      ps: with ps; [
+      ];
+
+    meta = with lib; {
+      description = "ComfyLiterals";
+      homepage = "https://github.com/M1kep/ComfyLiterals";
+      license = licenses.gpl3;
+    };
+  };
+
 in
 {
   inherit
@@ -799,5 +833,6 @@ in
     comfyui-seedvr2_videoupscaler
     comfyui-logic
     comfyui_essentials_mb
+    comfyliterals
     ;
 }

@@ -511,6 +511,9 @@ let
             if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI_essentials_mb" ]]; then
                 ln -sf "${customNodes.comfyui_essentials_mb}" "$BASE_DIR/custom_nodes/ComfyUI_essentials_mb"
             fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/ComfyLiterals" ]]; then
+                ln -sf "${customNodes.comfyliterals}" "$BASE_DIR/custom_nodes/ComfyLiterals"
+            fi
 
             # Create default ComfyUI-Manager config if it doesn't exist
             # Note: Manager moved config from user/default/ComfyUI-Manager to user/__manager

@@ -290,5 +290,13 @@
       rev = "67d7ceb97d465d66a8768069775fc30edee66991"; # v1.1.1
       hash = "sha256-c/oUbt5S2eEv5Y6ZrijHMWys6SYlou+lSfjZ9Q9NVSM=";
     };
+
+    comfyliterals = {
+      version = "2026-02-05";
+      owner = "M1kep";
+      repo = "ComfyLiterals";
+      rev = "bdddb08ca82d90d75d97b1d437a652e0284a32ac";
+      hash = "sha256-4sP87Ntm5mrNcvKhbUjLVIsVtch/oMLAoGR1OCSfAaM=";
+    };
   };
 }
