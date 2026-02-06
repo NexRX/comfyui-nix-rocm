@@ -529,7 +529,8 @@ let
                 ln -sf "${customNodes.intelligentvramnode}" "$BASE_DIR/custom_nodes/IntelligentVRAMNode"
             fi
             if [[ ! -e "$BASE_DIR/custom_nodes/comfyui-frame-interpolation_cudafull" ]]; then
-                ln -sf "${customNodes.comfyui-frame-interpolation_cudafull}" "$BASE_DIR/custom_nodes/comfyui-frame-interpolation_cudafull"
+                cp -r "${customNodes.comfyui-frame-interpolation_cudafull}" "$BASE_DIR/custom_nodes/comfyui-frame-interpolation_cudafull"
+                chmod -R 777 "$BASE_DIR/custom_nodes/comfyui-frame-interpolation_cudafull"
             fi
             if [[ ! -e "$BASE_DIR/custom_nodes/comfy_mtb" ]]; then
                 ln -sf "${customNodes.comfy_mtb}" "$BASE_DIR/custom_nodes/comfy_mtb"
