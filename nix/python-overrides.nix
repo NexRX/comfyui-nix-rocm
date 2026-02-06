@@ -604,29 +604,53 @@ lib.optionalAttrs useRocm {
   };
 }
 
-#sageattention - not in older nixpkgs, needed for KJNodes
+# color-matcher - not in older nixpkgs, needed for KJNodes
 // {
-  "sageattention" = final.buildPythonPackage rec {
-    pname = "sageattention";
-    version = versions.vendored."sageattention".version;
-    format = "wheel";
-    src = pkgs.fetchurl {
-      url = versions.vendored."sageattention".url;
-      hash = versions.vendored."sageattention".hash;
-    };
-    dontBuild = true;
-    dontConfigure = true;
-    nativeBuildInputs = [ pkgs.gnused ];
-    propagatedBuildInputs = with final; [
-      numpy
-      torch
-      torchvision
-      triton
-    ];
-    doCheck = false;
-    pythonImportsCheck = [ "sageattention" ];
-  };
+  "triton-rocm" = final.triton;
+  # "triton-rocm" = final.buildPythonPackage rec {
+  #   pname = "triton-rocm";
+  #   version = versions.vendored."triton-rocm".version;
+  #   format = "wheel";
+  #   src = pkgs.fetchurl {
+  #     url = versions.vendored."triton-rocm".url;
+  #     hash = versions.vendored."triton-rocm".hash;
+  #   };
+  #   propagatedBuildInputs = with final; [
+  #     numpy
+  #     pillow
+  #     scipy
+  #   ];
+  #   doCheck = false;
+  #   # pythonImportsCheck = [ "triton_rocm" ];
+  # };
 }
+
+#sageattention - not in older nixpkgs, needed for KJNodes
+# very broken as of version date
+# // {
+#   "sageattention" = final.buildPythonPackage rec {
+#     pname = "sageattention";
+#     version = versions.vendored."sageattention".version;
+#     format = "pyproject";
+#     src = pkgs.fetchFromGitHub {
+#       owner = versions.vendored."sageattention".owner;
+#       repo = versions.vendored."sageattention".repo;
+#       rev = versions.vendored."sageattention".rev;
+#       hash = versions.vendored."sageattention".hash;
+#     };
+#     nativeBuildInputs = [ pkgs.gnused ];
+#     propagatedBuildInputs = with final; [
+#       numpy
+#       torch
+#       torchvision
+#       triton-rocm
+#       setuptools
+#     ];
+#     doCheck = false;
+#     pythonImportsCheck = [ "sageattention" ];
+#   };
+# }
+
 
 # facexlib - face processing library needed by PuLID
 # Patched to support FACEXLIB_MODELPATH env var for read-only Nix store compatibility

@@ -136,7 +136,7 @@ let
         beautifulsoup4
         platformdirs
         ultralytics
-        triton-no-cuda
+        triton-rocm
       ];
       # ComfyUI Manager and common custom node dependencies
       extras =
@@ -201,8 +201,8 @@ let
           rich
           rich-argparse
           cachetools
-          sageattention
-          triton-no-cuda
+          # sageattention # broke
+          triton-rocm
         ]
         ++ [ ps."color-matcher" ]; # Color matching (hyphenated name needs quoting)
       optionals =
@@ -666,7 +666,8 @@ let
       ]
       ++ lib.optionals (python.pkgs ? xformers) [ python.pkgs.xformers ]
       ++ lib.optionals (python.pkgs ? bitsandbytes) [ python.pkgs.bitsandbytes ]
-      ++ lib.optionals (python.pkgs ? triton) [ python.pkgs.triton ];
+      # ++ lib.optionals (python.pkgs ? triton) [ python.pkgs.triton ]
+      ;
     };
 
     meta = with lib; {

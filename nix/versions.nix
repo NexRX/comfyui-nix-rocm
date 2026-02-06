@@ -86,10 +86,20 @@
       hash = "sha256-/WQvlBTDO38+vJb+CIjBxiAINhQmZFic4sy1LrzadzQ=";
     };
 
-    sageattention = {
-      version = "1.0.6";
-      url = "https://files.pythonhosted.org/packages/53/06/f7b47adb766bcb38b3f88763374a3e8dffea05ee9b556bc24dbcbd60fd29/sageattention-1.0.6-py3-none-any.whl";
-      hash = "sha256-+vxmVpvtYqFoOeggwmEhQbWiCsz1W4dtlBurnArF2Ig=";
+
+    # dont use, very broken as of date
+    # sageattention = {
+    #   version = "2026-02-05";
+    #   owner = "thu-ml";
+    #   repo = "SageAttention";
+    #   rev = "2bec28a19edaba8cddfba60c0ab87a0f7f9b58f6";
+    #   hash = "sha256-IYk4ZQ4z/M2MOA4BRUnTfai+DS6kYt0VNI0z1tJfKxY=";
+    # };
+
+    triton-rocm = {
+      version = "3.6.0";
+      url = "https://download.pytorch.org/whl/triton_rocm-3.6.0-cp312-cp312-linux_x86_64.whl";
+      hash = "sha256-z/FQgnhMcFawr5NHdw4DSrCozLzgZCcj3cjI3hvWrz8=";
     };
 
     # facexlib - face processing library needed by PuLID

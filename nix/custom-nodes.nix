@@ -138,7 +138,8 @@ let
       ps: with ps; [
         color-matcher
         mss
-        sageattention
+        # sageattention # broke
+        triton-rocm
       ];
 
     meta = with lib; {
