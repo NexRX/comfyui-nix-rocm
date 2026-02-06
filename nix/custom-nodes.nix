@@ -996,23 +996,48 @@ let
     # Python dependencies required
     passthru.pythonDeps =
       ps: with ps; [
-        qrcode
-        onnxruntime # onnxruntime-gpu
-        requirements-parser
-        # opencv-contrib
-        rembg
-        imageio-ffmpeg
-        rich
-        rich-argparse
-        matplotlib
-        pillow
-        cachetools
-        transformers
+
       ];
 
     meta = with lib; {
       description = "comfyui-mxtoolkit";
       homepage = "https://github.com/Smirnov75/ComfyUI-mxToolkit";
+      license = licenses.gpl3;
+    };
+  };
+
+  # comfyui-mxtoolkit
+  comfyui-vfi = pkgs.stdenv.mkDerivation {
+    pname = "comfyui-vfi";
+    version = versions.customNodes.comfyui-vfi.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.comfyui-vfi.owner;
+      repo = versions.customNodes.comfyui-vfi.repo;
+      rev = versions.customNodes.comfyui-vfi.rev;
+      hash = versions.customNodes.comfyui-vfi.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    # Python dependencies required
+    passthru.pythonDeps =
+      ps: with ps; [
+        numpy
+        requests
+      ];
+
+    meta = with lib; {
+      description = "comfyui-vfi";
+      homepage = "https://github.com/GACLove/ComfyUI-VFI";
       license = licenses.gpl3;
     };
   };
@@ -1045,5 +1070,6 @@ in
     comfyui-frame-interpolation_cudafull
     comfy_mtb
     comfyui-mxtoolkit
+    comfyui-vfi
     ;
 }

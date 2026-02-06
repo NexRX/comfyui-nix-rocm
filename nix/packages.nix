@@ -203,6 +203,7 @@ let
           cachetools
           # sageattention # broke
           triton-rocm
+          requests
         ]
         ++ [ ps."color-matcher" ]; # Color matching (hyphenated name needs quoting)
       optionals =
@@ -540,6 +541,9 @@ let
             fi
             if [[ ! -e "$BASE_DIR/custom_nodes/comfyui-mxtoolkit" ]]; then
                 ln -sf "${customNodes.comfyui-mxtoolkit}" "$BASE_DIR/custom_nodes/comfyui-mxtoolkit"
+            fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI-VFI" ]]; then
+                ln -sf "${customNodes.comfyui-vfi}" "$BASE_DIR/custom_nodes/ComfyUI-VFI"
             fi
 
             # Create default ComfyUI-Manager config if it doesn't exist

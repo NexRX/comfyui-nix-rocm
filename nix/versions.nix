@@ -354,5 +354,13 @@
       rev = "7f7a0e584f12078a1c589645d866ae96bad0cc35";
       hash = "sha256-0vf6rkDzUvsQwhmOHEigq1yUd/VQGFNLwjp9/P9wJ10=";
     };
+
+    comfyui-vfi = {
+      version = "2026-02-05";
+      owner = "GACLove";
+      repo = "ComfyUI-VFI";
+      rev = "6176a430f12cd16003f4664c1e3c6af8e96cc3c6";
+      hash = "sha256-Iw8yzW01QVEAOvgc1S8z8+hhsybj/JProLSPtJtvvf0=";
+    };
   };
 }
