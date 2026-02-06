@@ -336,7 +336,7 @@
       owner = "Smirnov75";
       repo = "ComfyUI-mxToolkit";
       rev = "7f7a0e584f12078a1c589645d866ae96bad0cc35";
-      hash = "sha256-5zFhI8HdYvkuv7CBiZMBT1BbKBnC2Dit0xRXWiBQWER=";
+      hash = "sha256-0vf6rkDzUvsQwhmOHEigq1yUd/VQGFNLwjp9/P9wJ10=";
     };
   };
 }
