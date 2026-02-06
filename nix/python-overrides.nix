@@ -32,17 +32,26 @@ let
     [
       clr # ROCm core runtime
       rocm-core
-      hipblas
-      hipfft
-      hipsparse
-      hipsolver
+      rocm-runtime
+      rocm-device-libs
+      rocm-cmake
+      rocm-smi
       rocrand
       rocblas
       rocsparse
       rocsolver
       rocfft
-      miopen
       rccl
+      rocminfo
+      roctracer
+      rocprofiler
+      hipcc
+      hip-common
+      hipblas
+      hipfft
+      hipsparse
+      hipsolver
+      miopen
     ]
   );
 in
@@ -650,7 +659,6 @@ lib.optionalAttrs useRocm {
 #     pythonImportsCheck = [ "sageattention" ];
 #   };
 # }
-
 
 # facexlib - face processing library needed by PuLID
 # Patched to support FACEXLIB_MODELPATH env var for read-only Nix store compatibility
