@@ -969,6 +969,52 @@ let
     };
   };
 
+  # comfyui-mxtoolkit
+  comfyui-mxtoolkit = pkgs.stdenv.mkDerivation {
+    pname = "comfyui-mxtoolkit";
+    version = versions.customNodes.comfyui-mxtoolkit.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.comfyui-mxtoolkit.owner;
+      repo = versions.customNodes.comfyui-mxtoolkit.repo;
+      rev = versions.customNodes.comfyui-mxtoolkit.rev;
+      hash = versions.customNodes.comfyui-mxtoolkit.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    # Python dependencies required
+    passthru.pythonDeps =
+      ps: with ps; [
+        qrcode
+        onnxruntime # onnxruntime-gpu
+        requirements-parser
+        # opencv-contrib
+        rembg
+        imageio-ffmpeg
+        rich
+        rich-argparse
+        matplotlib
+        pillow
+        cachetools
+        transformers
+      ];
+
+    meta = with lib; {
+      description = "comfyui-mxtoolkit";
+      homepage = "https://github.com/Smirnov75/ComfyUI-mxToolkit";
+      license = licenses.gpl3;
+    };
+  };
+
 in
 {
   inherit
@@ -996,5 +1042,6 @@ in
     intelligentvramnode
     comfyui-frame-interpolation_cudafull
     comfy_mtb
+    comfyui-mxtoolkit
     ;
 }

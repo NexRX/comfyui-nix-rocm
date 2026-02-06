@@ -328,7 +328,15 @@
       owner = "melMass";
       repo = "comfy_mtb";
       rev = "d87e52ea2c112fd95f257dcd6a54a5db77a34fc3";
-      hash = "sha256-5zFhI8HdYvkuv7CBiZMBT1BbKBnC2Dit0xRXWiBjJsQ=";
+      hash = "sha256-5zFhI8HdYvkuv7CBiZMBT1BbKBnC2Dit0xRXWiBABCD=";
+    };
+
+    comfyui-mxtoolkit = {
+      version = "2026-02-05";
+      owner = "Smirnov75";
+      repo = "ComfyUI-mxToolkit";
+      rev = "7f7a0e584f12078a1c589645d866ae96bad0cc35";
+      hash = "sha256-5zFhI8HdYvkuv7CBiZMBT1BbKBnC2Dit0xRXWiBQWER=";
     };
   };
 }

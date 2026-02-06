@@ -534,6 +534,9 @@ let
             if [[ ! -e "$BASE_DIR/custom_nodes/comfy_mtb" ]]; then
                 ln -sf "${customNodes.comfy_mtb}" "$BASE_DIR/custom_nodes/comfy_mtb"
             fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/comfyui-mxtoolkit" ]]; then
+                ln -sf "${customNodes.comfyui-mxtoolkit}" "$BASE_DIR/custom_nodes/comfyui-mxtoolkit"
+            fi
 
             # Create default ComfyUI-Manager config if it doesn't exist
             # Note: Manager moved config from user/default/ComfyUI-Manager to user/__manager
