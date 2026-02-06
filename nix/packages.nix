@@ -136,6 +136,7 @@ let
         beautifulsoup4
         platformdirs
         ultralytics
+        triton-no-cuda
       ];
       # ComfyUI Manager and common custom node dependencies
       extras =
@@ -200,6 +201,8 @@ let
           rich
           rich-argparse
           cachetools
+          sageattention
+          triton-no-cuda
         ]
         ++ [ ps."color-matcher" ]; # Color matching (hyphenated name needs quoting)
       optionals =

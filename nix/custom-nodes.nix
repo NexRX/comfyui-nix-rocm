@@ -138,6 +138,7 @@ let
       ps: with ps; [
         color-matcher
         mss
+        sageattention
       ];
 
     meta = with lib; {

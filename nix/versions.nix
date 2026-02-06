@@ -86,6 +86,12 @@
       hash = "sha256-/WQvlBTDO38+vJb+CIjBxiAINhQmZFic4sy1LrzadzQ=";
     };
 
+    sageattention = {
+      version = "1.0.6";
+      url = "https://files.pythonhosted.org/packages/53/06/f7b47adb766bcb38b3f88763374a3e8dffea05ee9b556bc24dbcbd60fd29/sageattention-1.0.6-py3-none-any.whl";
+      hash = "sha256-+vxmVpvtYqFoOeggwmEhQbWiCsz1W4dtlBurnArF2Ig=";
+    };
+
     # facexlib - face processing library needed by PuLID
     facexlib = {
       version = "0.3.0";

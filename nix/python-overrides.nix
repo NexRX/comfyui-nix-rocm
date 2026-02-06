@@ -604,6 +604,30 @@ lib.optionalAttrs useRocm {
   };
 }
 
+#sageattention - not in older nixpkgs, needed for KJNodes
+// {
+  "sageattention" = final.buildPythonPackage rec {
+    pname = "sageattention";
+    version = versions.vendored."sageattention".version;
+    format = "wheel";
+    src = pkgs.fetchurl {
+      url = versions.vendored."sageattention".url;
+      hash = versions.vendored."sageattention".hash;
+    };
+    dontBuild = true;
+    dontConfigure = true;
+    nativeBuildInputs = [ pkgs.gnused ];
+    propagatedBuildInputs = with final; [
+      numpy
+      torch
+      torchvision
+      triton
+    ];
+    doCheck = false;
+    pythonImportsCheck = [ "sageattention" ];
+  };
+}
+
 # facexlib - face processing library needed by PuLID
 # Patched to support FACEXLIB_MODELPATH env var for read-only Nix store compatibility
 // {
