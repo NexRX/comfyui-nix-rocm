@@ -328,7 +328,7 @@
       owner = "melMass";
       repo = "comfy_mtb";
       rev = "d87e52ea2c112fd95f257dcd6a54a5db77a34fc3";
-      hash = "sha256-5zFhI8HdYvkuv7CBiZMBT1BbKBnC2Dit0xRXWiBABCD=";
+      hash = "sha256-cMOE6sR8uPlRlob55tE3JgztsCimEZWvVSa7Qf2l9No=";
     };
 
     comfyui-mxtoolkit = {
