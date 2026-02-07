@@ -1006,7 +1006,7 @@ let
     };
   };
 
-  # comfyui-mxtoolkit
+  # comfyui-vfi
   comfyui-vfi = pkgs.stdenv.mkDerivation {
     pname = "comfyui-vfi";
     version = versions.customNodes.comfyui-vfi.version;
@@ -1042,6 +1042,92 @@ let
     };
   };
 
+  # comfyui-int-and-float
+  comfyui-int-and-float = pkgs.stdenv.mkDerivation {
+    pname = "comfyui-int-and-float";
+    version = versions.customNodes.comfyui-int-and-float.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.comfyui-int-and-float.owner;
+      repo = versions.customNodes.comfyui-int-and-float.repo;
+      rev = versions.customNodes.comfyui-int-and-float.rev;
+      hash = versions.customNodes.comfyui-int-and-float.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    # Python dependencies required
+    passthru.pythonDeps =
+      ps: with ps; [
+
+      ];
+
+    meta = with lib; {
+      description = "comfyui-int-and-float";
+      homepage = "https://github.com/danTheMonk/comfyui-int-and-float";
+      license = licenses.gpl3;
+    };
+  };
+
+  # facerestore_cf
+  facerestore_cf = pkgs.stdenv.mkDerivation {
+    pname = "facerestore_cf";
+    version = versions.customNodes.facerestore_cf.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.facerestore_cf.owner;
+      repo = versions.customNodes.facerestore_cf.repo;
+      rev = versions.customNodes.facerestore_cf.rev;
+      hash = versions.customNodes.facerestore_cf.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    # Python dependencies required
+    passthru.pythonDeps =
+      ps: with ps; [
+        opencv-python
+        numpy
+        torch
+        torchvision
+        addict
+        future
+        lmdb
+        Pillow
+        pyyaml
+        requests
+        scikit-image
+        scipy
+        tb-nightly
+        tqdm
+        yapf
+        lpips
+        gdown
+      ];
+
+    meta = with lib; {
+      description = "facerestore_cf";
+      homepage = "https://github.com/mav-rik/facerestore_cf";
+      license = licenses.gpl3;
+    };
+  };
+
 in
 {
   inherit
@@ -1071,5 +1157,7 @@ in
     comfy_mtb
     comfyui-mxtoolkit
     comfyui-vfi
+    comfyui-int-and-float
+    facerestore_cf
     ;
 }

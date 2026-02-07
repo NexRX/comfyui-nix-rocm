@@ -137,6 +137,7 @@ let
         platformdirs
         ultralytics
         triton-rocm
+        tb-nightly
       ];
       # ComfyUI Manager and common custom node dependencies
       extras =
@@ -204,6 +205,14 @@ let
           # sageattention # broke
           triton-rocm
           requests
+          addict
+          future
+          lmdb
+          pyyaml
+          yapf
+          gdown
+          tb-nightly
+          lpips
         ]
         ++ [ ps."color-matcher" ]; # Color matching (hyphenated name needs quoting)
       optionals =
@@ -544,6 +553,12 @@ let
             fi
             if [[ ! -e "$BASE_DIR/custom_nodes/ComfyUI-VFI" ]]; then
                 ln -sf "${customNodes.comfyui-vfi}" "$BASE_DIR/custom_nodes/ComfyUI-VFI"
+            fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/comfyui-int-and-float" ]]; then
+                ln -sf "${customNodes.comfyui-int-and-float}" "$BASE_DIR/custom_nodes/comfyui-int-and-float"
+            fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/facerestore_cf" ]]; then
+                ln -sf "${customNodes.facerestore_cf}" "$BASE_DIR/custom_nodes/facerestore_cf"
             fi
 
             # Create default ComfyUI-Manager config if it doesn't exist

@@ -86,7 +86,6 @@
       hash = "sha256-/WQvlBTDO38+vJb+CIjBxiAINhQmZFic4sy1LrzadzQ=";
     };
 
-
     # dont use, very broken as of date
     # sageattention = {
     #   version = "2026-02-05";
@@ -107,6 +106,20 @@
       version = "0.3.0";
       url = "https://files.pythonhosted.org/packages/36/7b/2147339dafe1c4800514c9c21ee4444f8b419ce51dfc7695220a8e0069a6/facexlib-0.3.0-py3-none-any.whl";
       hash = "sha256-JF1YhhU3uCDGFuiz72GMz60qJHJKLXS+KwVCZDwBqHg=";
+    };
+
+    # tb-nightly - needed by mav-rik/facerestore_cf
+    tb-nightly = {
+      version = "2.21.20251023";
+      url = "https://files.pythonhosted.org/packages/9a/a8/65f385e7d3e7e8489c030d22ca4c0c0a02d92b755e6e8873d84c7d8174bd/tb_nightly-2.21.0a20251023-py3-none-any.whl";
+      hash = "sha256-Np+PfBYLh9FVFaNbSfSawyEu8FR+0g5N7jfPDqcHnSg=";
+    };
+
+    # lpips - needed by mav-rik/facerestore_cf
+    lpips = {
+      version = "0.1.4";
+      url = "https://files.pythonhosted.org/packages/9b/13/1df50c7925d9d2746702719f40e864f51ed66f307b20ad32392f1ad2bb87/lpips-0.1.4-py3-none-any.whl";
+      hash = "sha256-/VN69YKLadLm/8Cjl71Qbbwoyhg1Q2F2kIRMCOEC7F4=";
     };
   };
 
@@ -361,6 +374,22 @@
       repo = "ComfyUI-VFI";
       rev = "6176a430f12cd16003f4664c1e3c6af8e96cc3c6";
       hash = "sha256-Iw8yzW01QVEAOvgc1S8z8+hhsybj/JProLSPtJtvvf0=";
+    };
+
+    comfyui-int-and-float = {
+      version = "2026-02-05";
+      owner = "danTheMonk";
+      repo = "comfyui-int-and-float";
+      rev = "a8b5a383ec6b5cff43c2f81a9a3aa24b87c4c720";
+      hash = "sha256-ukeiz7t/v+fFd8zuNIt3CA/TuPPpo/7JyM0d4RYSWj8=";
+    };
+
+    facerestore_cf = {
+      version = "2026-02-05";
+      owner = "mav-rik";
+      repo = "facerestore_cf";
+      rev = "ff4d7a5c102441d8f058dd6135797ffb57b6c6ad";
+      hash = "sha256-eAlj1QtH5RMSB7O9QkKTraYpPa1LWCyJmZaB3yAVpXc=";
     };
   };
 }

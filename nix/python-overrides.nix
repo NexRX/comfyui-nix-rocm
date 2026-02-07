@@ -660,6 +660,52 @@ lib.optionalAttrs useRocm {
 #   };
 # }
 
+# tb-nightly - not in older nixpkgs, needed for mav-rik/facerestore_cf
+// {
+  "tb-nightly" = final.buildPythonPackage rec {
+    pname = "tb-nightly";
+    version = versions.vendored."tb-nightly".version;
+    format = "wheel";
+    src = pkgs.fetchurl {
+      url = versions.vendored."tb-nightly".url;
+      hash = versions.vendored."tb-nightly".hash;
+    };
+    propagatedBuildInputs = with final; [
+      numpy
+      pillow
+      scipy
+    ];
+    doCheck = false;
+    # pythonImportsCheck = [ "tb-nightly" ];
+  };
+}
+
+# lpips - not in older nixpkgs, needed for mav-rik/facerestore_cf
+// {
+  "lpips" = final.buildPythonPackage rec {
+    pname = "lpips";
+    version = versions.vendored."lpips".version;
+    format = "wheel";
+    src = pkgs.fetchurl {
+      url = versions.vendored."lpips".url;
+      hash = versions.vendored."lpips".hash;
+    };
+    propagatedBuildInputs = with final; [
+      torch
+      torchvision
+      numpy
+      scipy
+      scikit-image
+      opencv-python
+      matplotlib
+      tqdm
+      jupyter
+    ];
+    doCheck = false;
+    pythonImportsCheck = [ "lpips" ];
+  };
+}
+
 # facexlib - face processing library needed by PuLID
 # Patched to support FACEXLIB_MODELPATH env var for read-only Nix store compatibility
 // {
