@@ -121,6 +121,13 @@
       url = "https://files.pythonhosted.org/packages/9b/13/1df50c7925d9d2746702719f40e864f51ed66f307b20ad32392f1ad2bb87/lpips-0.1.4-py3-none-any.whl";
       hash = "sha256-/VN69YKLadLm/8Cjl71Qbbwoyhg1Q2F2kIRMCOEC7F4=";
     };
+
+    # # pytorch-lightning-whl
+    # pytorch-lightning-whl = {
+    #   version = "2.6.1";
+    #   url = "https://files.pythonhosted.org/packages/0e/93/c8c361bf0a2fe50f828f32def460e8b8a14b93955d3fd302b1a9b63b19e4/pytorch_lightning-2.6.1-py3-none-any.whl";
+    #   hash = "sha256-/VN69YKLadLm/8Cjl71Qbbwoyhg1QXXXXXXXXXXXXXX=";
+    # };
   };
 
   # Pre-built PyTorch wheels from pytorch.org
@@ -390,6 +397,22 @@
       repo = "facerestore_cf";
       rev = "ff4d7a5c102441d8f058dd6135797ffb57b6c6ad";
       hash = "sha256-eAlj1QtH5RMSB7O9QkKTraYpPa1LWCyJmZaB3yAVpXc=";
+    };
+
+    comfyui-swinir = {
+      version = "2026-02-05";
+      owner = "alexcong";
+      repo = "ComfyUI-SwinIR";
+      rev = "119f39184d6801630cbea754c43badf034595323";
+      hash = "sha256-jpU98L8UQlqEHUNMbZUR6WCErmLj6vlmejfZ6xow+rY=";
+    };
+
+    comfyui-supir = {
+      version = "2026-02-05";
+      owner = "kijai";
+      repo = "ComfyUI-SUPIR";
+      rev = "0613a9239f49b062adba6c12072942e1724a7cbd";
+      hash = "sha256-Qs7HpSBpnvT8QEgDKqn4Ky0SSeR9RdnqnFcIIGW/tnk=";
     };
   };
 }

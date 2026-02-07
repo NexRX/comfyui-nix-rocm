@@ -213,6 +213,7 @@ let
           gdown
           tb-nightly
           lpips
+          # pytorch-lightning-whl
         ]
         ++ [ ps."color-matcher" ]; # Color matching (hyphenated name needs quoting)
       optionals =
@@ -560,6 +561,12 @@ let
             if [[ ! -e "$BASE_DIR/custom_nodes/facerestore_cf" ]]; then
                 cp -r "${customNodes.facerestore_cf}" "$BASE_DIR/custom_nodes/facerestore_cf"
                 chmod -R 777 "$BASE_DIR/custom_nodes/facerestore_cf"
+            fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/comfyui-swinir" ]]; then
+                ln -sf "${customNodes.comfyui-swinir}" "$BASE_DIR/custom_nodes/comfyui-swinir"
+            fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/comfyui-supir" ]]; then
+                ln -sf "${customNodes.comfyui-supir}" "$BASE_DIR/custom_nodes/comfyui-supir"
             fi
 
             # Create default ComfyUI-Manager config if it doesn't exist

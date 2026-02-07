@@ -102,6 +102,7 @@ lib.optionalAttrs useRocm {
         networkx
         jinja2
         fsspec
+        # setuptool
       ];
       # Don't check for ROCm at import time (requires GPU)
       pythonImportsCheck = [ ];
@@ -705,6 +706,32 @@ lib.optionalAttrs useRocm {
     pythonImportsCheck = [ "lpips" ];
   };
 }
+
+# // {
+#   "pytorch-lightning-whl" = final.buildPythonPackage rec {
+#     pname = "pytorch-lightning-whl";
+#     version = versions.vendored."pytorch-lightning-whl".version;
+#     format = "wheel";
+#     src = pkgs.fetchurl {
+#       url = versions.vendored."pytorch-lightning-whl".url;
+#       hash = versions.vendored."pytorch-lightning-whl".hash;
+#     };
+#     propagatedBuildInputs = with final; [
+#       # below was not check and was lazilly copied
+#       torch
+#       torchvision
+#       numpy
+#       scipy
+#       scikit-image
+#       opencv-python
+#       matplotlib
+#       tqdm
+#       jupyter
+#     ];
+#     doCheck = false;
+#     pythonImportsCheck = [ "pytorch-lightning-whl" ];
+#   };
+# }
 
 # facexlib - face processing library needed by PuLID
 # Patched to support FACEXLIB_MODELPATH env var for read-only Nix store compatibility

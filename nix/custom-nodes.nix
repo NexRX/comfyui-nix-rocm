@@ -1128,6 +1128,88 @@ let
     };
   };
 
+  # comfyui-swinir
+  comfyui-swinir = pkgs.stdenv.mkDerivation {
+    pname = "comfyui-swinir";
+    version = versions.customNodes.comfyui-swinir.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.comfyui-swinir.owner;
+      repo = versions.customNodes.comfyui-swinir.repo;
+      rev = versions.customNodes.comfyui-swinir.rev;
+      hash = versions.customNodes.comfyui-swinir.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    # Python dependencies required
+    passthru.pythonDeps =
+      ps: with ps; [
+        timm
+        numpy
+        torch
+      ];
+
+    meta = with lib; {
+      description = "comfyui-swinir";
+      homepage = "https://github.com/alexcong/ComfyUI-SwinIR";
+      license = licenses.gpl3;
+    };
+  };
+
+  # comfyui-supir
+  comfyui-supir = pkgs.stdenv.mkDerivation {
+    pname = "comfyui-supir";
+    version = versions.customNodes.comfyui-supir.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.comfyui-supir.owner;
+      repo = versions.customNodes.comfyui-supir.repo;
+      rev = versions.customNodes.comfyui-supir.rev;
+      hash = versions.customNodes.comfyui-supir.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    propagatedBuildInputs = [
+      pkgs.python312Packages.setuptools
+      # other dependencies
+    ];
+
+    # Python dependencies required
+    passthru.pythonDeps =
+      ps: with ps; [
+        transformers
+        open-clip-torch
+        pillow
+        # pytorch-lightning
+        omegaconf
+        accelerate
+      ];
+
+    meta = with lib; {
+      description = "comfyui-supir";
+      homepage = "https://github.com/kijai/ComfyUI-SUPIR";
+      license = licenses.gpl3;
+    };
+  };
+
 in
 {
   inherit
@@ -1159,5 +1241,7 @@ in
     comfyui-vfi
     comfyui-int-and-float
     facerestore_cf
+    comfyui-swinir
+    comfyui-supir
     ;
 }
