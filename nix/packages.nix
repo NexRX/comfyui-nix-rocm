@@ -569,7 +569,8 @@ let
                 ln -sf "${customNodes.comfyui-swinir}" "$BASE_DIR/custom_nodes/comfyui-swinir"
             fi
             if [[ ! -e "$BASE_DIR/custom_nodes/comfyui-supir" ]]; then
-                ln -sf "${customNodes.comfyui-supir}" "$BASE_DIR/custom_nodes/comfyui-supir"
+                cp -r "${customNodes.comfyui-supir}" "$BASE_DIR/custom_nodes/comfyui-supir"
+                chmod -R 777 "$BASE_DIR/custom_nodes/comfyui-supir"
             fi
 
             # Create default ComfyUI-Manager config if it doesn't exist
