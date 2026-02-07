@@ -558,7 +558,8 @@ let
                 ln -sf "${customNodes.comfyui-int-and-float}" "$BASE_DIR/custom_nodes/comfyui-int-and-float"
             fi
             if [[ ! -e "$BASE_DIR/custom_nodes/facerestore_cf" ]]; then
-                ln -sf "${customNodes.facerestore_cf}" "$BASE_DIR/custom_nodes/facerestore_cf"
+                cp -r "${customNodes.facerestore_cf}" "$BASE_DIR/custom_nodes/facerestore_cf"
+                chmod -R 777 "$BASE_DIR/custom_nodes/facerestore_cf"
             fi
 
             # Create default ComfyUI-Manager config if it doesn't exist
