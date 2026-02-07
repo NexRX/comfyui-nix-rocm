@@ -122,12 +122,19 @@
       hash = "sha256-/VN69YKLadLm/8Cjl71Qbbwoyhg1Q2F2kIRMCOEC7F4=";
     };
 
-    # # pytorch-lightning-whl
-    # pytorch-lightning-whl = {
-    #   version = "2.6.1";
-    #   url = "https://files.pythonhosted.org/packages/0e/93/c8c361bf0a2fe50f828f32def460e8b8a14b93955d3fd302b1a9b63b19e4/pytorch_lightning-2.6.1-py3-none-any.whl";
-    #   hash = "sha256-/VN69YKLadLm/8Cjl71Qbbwoyhg1QXXXXXXXXXXXXXX=";
-    # };
+    # pytorch-lightning-whl
+    pytorch-lightning-whl = {
+      version = "2.6.1";
+      url = "https://files.pythonhosted.org/packages/0e/93/c8c361bf0a2fe50f828f32def460e8b8a14b93955d3fd302b1a9b63b19e4/pytorch_lightning-2.6.1-py3-none-any.whl";
+      hash = "sha256-H4EYVn7IKeMFXxbPGqMgiDqGpHyDaVG/2dz6NOx//Vk=";
+    };
+
+    # pytorch-lightning-whl
+    torchmetrics-whl = {
+      version = "1.8.2";
+      url = "https://files.pythonhosted.org/packages/02/21/aa0f434434c48490f91b65962b1ce863fdcce63febc166ca9fe9d706c2b6/torchmetrics-1.8.2-py3-none-any.whl";
+      hash = "sha256-CDgv2WuSPjnpBMTVcPPUnizHHMq9KpTg+JXR8NrIYkI=";
+    };
   };
 
   # Pre-built PyTorch wheels from pytorch.org

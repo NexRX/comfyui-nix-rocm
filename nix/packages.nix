@@ -213,7 +213,10 @@ let
           gdown
           tb-nightly
           lpips
-          # pytorch-lightning-whl
+          # pytorch-lightning
+          pytorch-lightning-whl
+          lightning-utilities
+          torchmetrics-whl
         ]
         ++ [ ps."color-matcher" ]; # Color matching (hyphenated name needs quoting)
       optionals =

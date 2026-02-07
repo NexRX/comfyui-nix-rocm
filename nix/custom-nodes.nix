@@ -1198,7 +1198,9 @@ let
         transformers
         open-clip-torch
         pillow
-        # pytorch-lightning
+        pytorch-lightning-whl
+        lightning-utilities
+        torchmetrics-whl
         omegaconf
         accelerate
       ];

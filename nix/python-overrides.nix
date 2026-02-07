@@ -707,31 +707,48 @@ lib.optionalAttrs useRocm {
   };
 }
 
-# // {
-#   "pytorch-lightning-whl" = final.buildPythonPackage rec {
-#     pname = "pytorch-lightning-whl";
-#     version = versions.vendored."pytorch-lightning-whl".version;
-#     format = "wheel";
-#     src = pkgs.fetchurl {
-#       url = versions.vendored."pytorch-lightning-whl".url;
-#       hash = versions.vendored."pytorch-lightning-whl".hash;
-#     };
-#     propagatedBuildInputs = with final; [
-#       # below was not check and was lazilly copied
-#       torch
-#       torchvision
-#       numpy
-#       scipy
-#       scikit-image
-#       opencv-python
-#       matplotlib
-#       tqdm
-#       jupyter
-#     ];
-#     doCheck = false;
-#     pythonImportsCheck = [ "pytorch-lightning-whl" ];
-#   };
-# }
+// {
+  "pytorch-lightning-whl" = final.buildPythonPackage rec {
+    pname = "pytorch-lightning-whl";
+    version = versions.vendored."pytorch-lightning-whl".version;
+    format = "wheel";
+    src = pkgs.fetchurl {
+      url = versions.vendored."pytorch-lightning-whl".url;
+      hash = versions.vendored."pytorch-lightning-whl".hash;
+    };
+    propagatedBuildInputs = with final; [
+      # below was not check and was lazilly copied
+      torch
+      torchvision
+      numpy
+      scipy
+      scikit-image
+      opencv-python
+      matplotlib
+      tqdm
+      jupyter
+    ];
+    doCheck = false;
+    pythonImportsCheck = [ ];
+  };
+}
+
+// {
+  "torchmetrics-whl" = final.buildPythonPackage rec {
+    pname = "torchmetrics-whl";
+    version = versions.vendored."torchmetrics-whl".version;
+    format = "wheel";
+    src = pkgs.fetchurl {
+      url = versions.vendored."torchmetrics-whl".url;
+      hash = versions.vendored."torchmetrics-whl".hash;
+    };
+    propagatedBuildInputs = with final; [
+      # not real, unchecked
+    ];
+    doCheck = false;
+    pythonImportsCheck = [ ];
+  };
+}
 
 # facexlib - face processing library needed by PuLID
 # Patched to support FACEXLIB_MODELPATH env var for read-only Nix store compatibility
