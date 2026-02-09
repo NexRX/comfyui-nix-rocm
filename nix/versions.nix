@@ -444,5 +444,14 @@
       rev = "4c9a3123762af85e7c796e41737da0b70c75d72d";
       hash = "sha256-6xt4y2NzCX3hRQV74/+YMmETCdUuDSqUE8UweDorv9E=";
     };
+
+    # res4lyf - SigmasPreview
+    res4lyf = {
+      version = "2026-02-05";
+      owner = "ClownsharkBatwing";
+      repo = "RES4LYF";
+      rev = "7750bf7800b6ad9d670308a09989fc0c04c40cec";
+      hash = "sha256-ZVTXEP7TGXat+JmaJCVd/LS+F+Dx9WUo2m0FoJ4WRO0=";
+    };
   };
 }

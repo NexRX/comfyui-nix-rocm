@@ -221,6 +221,7 @@ let
           yacs
           easydict
           fastrlock
+          pywavelets
         ]
         ++ [ ps."color-matcher" ]; # Color matching (hyphenated name needs quoting)
       optionals =
@@ -581,6 +582,10 @@ let
             fi
             if [[ ! -e "$BASE_DIR/custom_nodes/comfyui-gimm-vfi" ]]; then
                 ln -sf "${customNodes.comfyui-gimm-vfi}" "$BASE_DIR/custom_nodes/comfyui-gimm-vfi"
+            fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/res4lyf" ]]; then
+                cp -r "${customNodes.res4lyf}" "$BASE_DIR/custom_nodes/res4lyf"
+                chmod -R 777 "$BASE_DIR/custom_nodes/res4lyf"
             fi
 
             # Create default ComfyUI-Manager config if it doesn't exist

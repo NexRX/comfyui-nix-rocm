@@ -1300,6 +1300,49 @@ let
     };
   };
 
+  # res4lyf
+  res4lyf = pkgs.stdenv.mkDerivation {
+    pname = "res4lyf";
+    version = versions.customNodes.res4lyf.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.res4lyf.owner;
+      repo = versions.customNodes.res4lyf.repo;
+      rev = versions.customNodes.res4lyf.rev;
+      hash = versions.customNodes.res4lyf.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    propagatedBuildInputs = [
+      pkgs.python312Packages.setuptools
+      # other dependencies
+    ];
+
+    # Python dependencies required
+    passthru.pythonDeps =
+      ps: with ps; [
+        opencv-python
+        matplotlib
+        pywavelets
+        numpy
+      ];
+
+    meta = with lib; {
+      description = "res4lyf - SigmasPreview";
+      homepage = "https://github.com/ClownsharkBatwing/RES4LYF";
+      license = licenses.gpl3;
+    };
+  };
+
 in
 {
   inherit
@@ -1335,5 +1378,6 @@ in
     comfyui-supir
     comfyui_bnb_nf4_fp4_loaders
     comfyui-gimm-vfi
+    res4lyf
     ;
 }
