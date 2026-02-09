@@ -217,6 +217,10 @@ let
           pytorch-lightning-whl
           lightning-utilities
           torchmetrics-whl
+          cupy-cuda12x
+          yacs
+          easydict
+          fastrlock
         ]
         ++ [ ps."color-matcher" ]; # Color matching (hyphenated name needs quoting)
       optionals =
@@ -571,6 +575,12 @@ let
             if [[ ! -e "$BASE_DIR/custom_nodes/comfyui-supir" ]]; then
                 cp -r "${customNodes.comfyui-supir}" "$BASE_DIR/custom_nodes/comfyui-supir"
                 chmod -R 777 "$BASE_DIR/custom_nodes/comfyui-supir"
+            fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/comfyui_bnb_nf4_fp4_loaders" ]]; then
+                ln -sf "${customNodes.comfyui_bnb_nf4_fp4_loaders}" "$BASE_DIR/custom_nodes/comfyui_bnb_nf4_fp4_loaders"
+            fi
+            if [[ ! -e "$BASE_DIR/custom_nodes/comfyui-gimm-vfi" ]]; then
+                ln -sf "${customNodes.comfyui-gimm-vfi}" "$BASE_DIR/custom_nodes/comfyui-gimm-vfi"
             fi
 
             # Create default ComfyUI-Manager config if it doesn't exist

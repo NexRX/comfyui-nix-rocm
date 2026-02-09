@@ -1212,6 +1212,94 @@ let
     };
   };
 
+  # comfyui_bnb_nf4_fp4_loaders
+  comfyui_bnb_nf4_fp4_loaders = pkgs.stdenv.mkDerivation {
+    pname = "comfyui_bnb_nf4_fp4_loaders";
+    version = versions.customNodes.comfyui_bnb_nf4_fp4_loaders.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.comfyui_bnb_nf4_fp4_loaders.owner;
+      repo = versions.customNodes.comfyui_bnb_nf4_fp4_loaders.repo;
+      rev = versions.customNodes.comfyui_bnb_nf4_fp4_loaders.rev;
+      hash = versions.customNodes.comfyui_bnb_nf4_fp4_loaders.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    propagatedBuildInputs = [
+      pkgs.python312Packages.setuptools
+      # other dependencies
+    ];
+
+    # Python dependencies required
+    passthru.pythonDeps =
+      ps: with ps; [
+        bitsandbytes-nf4
+      ];
+
+    meta = with lib; {
+      description = "comfyui_bnb_nf4_fp4_loaders";
+      homepage = "https://github.com/silveroxides/comfyui_bnb_nf4_fp4_loaders";
+      license = licenses.gpl3;
+    };
+  };
+
+  # comfyui-gimm-vfi
+  comfyui-gimm-vfi = pkgs.stdenv.mkDerivation {
+    pname = "comfyui-gimm-vfi";
+    version = versions.customNodes.comfyui-gimm-vfi.version;
+
+    src = pkgs.fetchFromGitHub {
+      owner = versions.customNodes.comfyui-gimm-vfi.owner;
+      repo = versions.customNodes.comfyui-gimm-vfi.repo;
+      rev = versions.customNodes.comfyui-gimm-vfi.rev;
+      hash = versions.customNodes.comfyui-gimm-vfi.hash;
+    };
+
+    dontBuild = true;
+    dontConfigure = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    propagatedBuildInputs = [
+      pkgs.python312Packages.setuptools
+      # other dependencies
+    ];
+
+    # Python dependencies required
+    passthru.pythonDeps =
+      ps: with ps; [
+        opencv-python
+        numpy
+        pillow
+        timm
+        omegaconf
+        cupy-cuda12x
+        yacs
+        easydict
+        fastrlock
+      ];
+
+    meta = with lib; {
+      description = "comfyui-gimm-vfi";
+      homepage = "https://github.com/kijai/comfyui-gimm-vfi";
+      license = licenses.gpl3;
+    };
+  };
+
 in
 {
   inherit
@@ -1245,5 +1333,7 @@ in
     facerestore_cf
     comfyui-swinir
     comfyui-supir
+    comfyui_bnb_nf4_fp4_loaders
+    comfyui-gimm-vfi
     ;
 }

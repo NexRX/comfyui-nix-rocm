@@ -750,6 +750,24 @@ lib.optionalAttrs useRocm {
   };
 }
 
+# todo, check if we can replace with cupy-rocm-X-X instead
+// {
+  "cupy-cuda12x" = final.buildPythonPackage rec {
+    pname = "cupy-cuda12x";
+    version = versions.vendored."cupy-cuda12x".version;
+    format = "wheel";
+    src = pkgs.fetchurl {
+      url = versions.vendored."cupy-cuda12x".url;
+      hash = versions.vendored."cupy-cuda12x".hash;
+    };
+    propagatedBuildInputs = with final; [
+      # not real, unchecked
+    ];
+    doCheck = false;
+    pythonImportsCheck = [ ];
+  };
+}
+
 # facexlib - face processing library needed by PuLID
 # Patched to support FACEXLIB_MODELPATH env var for read-only Nix store compatibility
 // {

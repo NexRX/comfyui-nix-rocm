@@ -135,6 +135,13 @@
       url = "https://files.pythonhosted.org/packages/02/21/aa0f434434c48490f91b65962b1ce863fdcce63febc166ca9fe9d706c2b6/torchmetrics-1.8.2-py3-none-any.whl";
       hash = "sha256-CDgv2WuSPjnpBMTVcPPUnizHHMq9KpTg+JXR8NrIYkI=";
     };
+
+    # cupy-cuda12x
+    cupy-cuda12x = {
+      version = "13.6.0";
+      url = "https://files.pythonhosted.org/packages/e0/95/d7e1295141e7d530674a3cc567e13ed0eb6b81524cb122d797ed996b5bea/cupy_cuda12x-13.6.0-cp312-cp312-manylinux2014_x86_64.whl";
+      hash = "sha256-ebDKy16LGQ70CfngPwasjeGwIbDA3aR2dNRG9VV+DrE=";
+    };
   };
 
   # Pre-built PyTorch wheels from pytorch.org
@@ -420,6 +427,22 @@
       repo = "ComfyUI-SUPIR";
       rev = "0613a9239f49b062adba6c12072942e1724a7cbd";
       hash = "sha256-Qs7HpSBpnvT8QEgDKqn4Ky0SSeR9RdnqnFcIIGW/tnk=";
+    };
+
+    comfyui_bnb_nf4_fp4_loaders = {
+      version = "2026-02-05";
+      owner = "silveroxides";
+      repo = "ComfyUI_bnb_nf4_fp4_Loaders";
+      rev = "dd2f774a2d3930de06fddc995901c830fc936715";
+      hash = "sha256-f0PAK2J/qa3cSU+hCIbyhQvH01aAAcpeIlpmJ8iSOw4=";
+    };
+
+    comfyui-gimm-vfi = {
+      version = "2026-02-05";
+      owner = "kijai";
+      repo = "ComfyUI-GIMM-VFI";
+      rev = "4c9a3123762af85e7c796e41737da0b70c75d72d";
+      hash = "sha256-6xt4y2NzCX3hRQV74/+YMmETCdUuDSqUE8UweDorv9E=";
     };
   };
 }
