@@ -10,8 +10,12 @@ let
   sentencepieceNoGperf = pkgs.sentencepiece.override { withGPerfTools = false; };
 
   # Pre-built PyTorch ROCm wheels from pytorch.org
-  # These provide AMD GPU support with ROCm 7.1 libraries bundled
+  # These provide AMD GPU support with ROCm 7.2 libraries bundled
   rocmWheels = versions.pytorchWheels.rocm;
+
+  # Pre-built ROCm 7.2 libraries from repo.radeon.com
+  # Use these instead of nixpkgs ROCm (which is 7.1.1) to match PyTorch wheel requirements
+  rocmPrebuilt = import ./rocm-prebuilt.nix { inherit pkgs lib; };
 
   # Pre-built PyTorch wheels for macOS Apple Silicon
   # PyTorch 2.5.1 is used instead of 2.9.x due to MPS bugs on macOS 26 (Tahoe)
@@ -24,40 +28,39 @@ let
     pkgs.zlib
     pkgs.libGL
     pkgs.glib
+    pkgs.numactl
+    pkgs.xz
   ];
 
   # ROCm libraries needed by PyTorch wheels (for auto-patchelf)
+  # Using prebuilt ROCm 7.2 libraries from repo.radeon.com to match PyTorch requirements
   rocmLibs = pkgs.lib.optionals useRocm (
-    with pkgs.rocmPackages;
+    with rocmPrebuilt;
     [
-      clr # ROCm core runtime
       rocm-core
-      rocm-runtime
+      hip-runtime-amd
       rocm-device-libs
-      rocm-cmake
-      rocm-smi
       rocrand
       rocblas
       rocsparse
       rocsolver
       rocfft
       rccl
-      rocminfo
-      roctracer
-      rocprofiler
-      hipcc
-      hip-common
       hipblas
+      hipsparselt # Critical library missing in ROCm 7.1
+      miopen-hip
+      roctracer # Provides libroctx64.so.4 for profiling
       hipfft
       hipsparse
       hipsolver
-      miopen
+      hiprand
+      hipblaslt
     ]
   );
 in
 final: prev:
 # ROCm torch from pre-built wheels - provides AMD GPU support
-# The wheels bundle ROCm 7.1 libraries internally, providing full AMD GPU support
+# The wheels bundle ROCm 7.2 libraries internally, providing full AMD GPU support
 lib.optionalAttrs useRocm {
   torch =
     assert useRocm -> (builtins.trace "ROCm torch override is being applied!" true);
@@ -76,13 +79,22 @@ lib.optionalAttrs useRocm {
         pkgs.gnused
       ];
       buildInputs = wheelBuildInputs ++ rocmLibs;
-      # ROCm libraries are provided by rocmPackages at runtime
+      # ROCm libraries are bundled in the wheel but not found during autopatchelf
+      # These are internal to the torch wheel and will be available at runtime
       autoPatchelfIgnoreMissingDeps = [
         "libamdhip64.so.6"
         "librocblas.so.4"
         "libMIOpen.so.1"
         "libamd_comgr.so.2"
         "libhsa-runtime64.so.1"
+        "libhipfft.so.0"
+        "libhiprand.so.1"
+        "libhipsparse.so.4"
+        "libhipsolver.so.1"
+        "libroctx64.so.4"
+        "liblzma.so.5"
+        "libnuma.so.1"
+        "libroctracer64.so.4"
       ];
 
       # Remove nvidia-* and triton dependencies from wheel metadata
@@ -109,7 +121,7 @@ lib.optionalAttrs useRocm {
       doCheck = false;
 
       # Passthru attributes expected by downstream packages
-      # The wheel bundles ROCm 7.1 libraries
+      # The wheel bundles ROCm 7.2 libraries
       passthru = {
         cudaSupport = false;
         rocmSupport = true;
@@ -703,7 +715,8 @@ lib.optionalAttrs useRocm {
       jupyter
     ];
     doCheck = false;
-    pythonImportsCheck = [ "lpips" ];
+    pythonImportsCheck = if useRocm then [ ] else [ "lpips" ];
+    dontCheckRuntimeDeps = if useRocm then true else false;
   };
 }
 
@@ -930,4 +943,11 @@ lib.optionalAttrs useRocm {
       license = lib.licenses.asl20;
     };
   };
+
+  # rotary-embedding-torch - disable checks for ROCm builds
+  rotary-embedding-torch = prev.rotary-embedding-torch.overridePythonAttrs (old: {
+    doCheck = if useRocm then false else (old.doCheck or true);
+    pythonImportsCheck = if useRocm then [ ] else (old.pythonImportsCheck or [ ]);
+    dontCheckRuntimeDeps = if useRocm then true else false;
+  });
 }

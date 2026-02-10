@@ -8,6 +8,9 @@
 let
   useRocm = rocmSupport;
 
+  # Pre-built ROCm 7.2 libraries from repo.radeon.com
+  rocmPrebuilt = import ./rocm-prebuilt.nix { inherit pkgs lib; };
+
   python = pkgs.python312.override { packageOverrides = pythonOverrides; };
 
   vendored = import ./vendored-packages.nix { inherit pkgs python versions; };
@@ -317,21 +320,37 @@ let
 
         # Add ROCm libraries if using ROCm support
         ${lib.optionalString useRocm ''
-          # PyTorch ROCm wheels bundle ROCm 7.1 libraries internally
+          # PyTorch ROCm wheels bundle ROCm 7.2 libraries internally
           # Add the torch lib directory to LD_LIBRARY_PATH so torchaudio can find them
           export LD_LIBRARY_PATH="${pythonRuntime}/lib/python3.12/site-packages/torch/lib:$LD_LIBRARY_PATH"
 
-          # Also add system ROCm libraries (for compatibility with other packages)
+          # Also add prebuilt ROCm 7.2 libraries (matching PyTorch wheel requirements)
           export LD_LIBRARY_PATH="${
             lib.makeLibraryPath (
-              with pkgs.rocmPackages;
+              with rocmPrebuilt;
               [
-                clr
+                rocm-smi-lib
+                hsa-rocr
+                rocprofiler-register
+                comgr
                 rocm-core
+                hip-runtime-amd
+                rocm-device-libs
                 hipblas
-                miopen
+                hipsparselt
+                miopen-hip
                 rocblas
                 rocsolver
+                rocrand
+                rocsparse
+                rocfft
+                rccl
+                roctracer
+                hipfft
+                hipsparse
+                hipsolver
+                hiprand
+                hipblaslt
               ]
             )
           }:$LD_LIBRARY_PATH"

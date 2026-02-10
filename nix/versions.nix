@@ -167,23 +167,38 @@
         hash = "sha256-8cv9/Ru9++conUenTzb/bF2HwyBWBiAv71p/tpP2HPA=";
       };
     };
-    # Linux x86_64 ROCm 7.1
+    # Linux x86_64 ROCm 7.2
     rocm = {
       torch = {
-        version = "2.10.0";
-        url = "https://download.pytorch.org/whl/rocm7.1/torch-2.10.0%2Brocm7.1-cp312-cp312-manylinux_2_28_x86_64.whl#sha256=008ee0d77bb8b5f9f4ee1f00212019c4619171e3c4195de56f253331b3bc320d";
-        hash = "sha256-AI7g13u4tfn07h8AISAZxGGRcePEGV3lbyUzMbO8Mg0=";
+        version = "2.9.1-rocm7.2";
+        url = "https://repo.radeon.com/rocm/manylinux/rocm-rel-7.2/torch-2.9.1%2Brocm7.2.0.lw.git7e1940d4-cp312-cp312-linux_x86_64.whl";
+        hash = "sha256-GZuhCouLWn7vZJhb+HpB8PSyjUmxuGGqJ2j2xTFMm4Y=";
       };
       torchvision = {
-        version = "0.25.0";
-        url = "https://download.pytorch.org/whl/rocm7.1/torchvision-0.25.0%2Brocm7.1-cp312-cp312-manylinux_2_28_x86_64.whl#sha256=8aea3ddbdb74801d3374577a10b3f04d49897c27add235cb25313df6e65b1929";
-        hash = "sha256-iuo929t0gB0zdFd6ELPwTUmJfCet0jXLJTE99uZbGSk=";
+        version = "0.24.0-rocm7.2";
+        url = "https://repo.radeon.com/rocm/manylinux/rocm-rel-7.2/torchvision-0.24.0%2Brocm7.2.0.gitb919bd0c-cp312-cp312-linux_x86_64.whl";
+        hash = "sha256-BxZn/Sbpr04FEn6rxXIBXR9injGAlqvIVLbJRvNGNZs=";
       };
       torchaudio = {
-        version = "2.10.0";
-        url = "https://download.pytorch.org/whl/rocm7.1/torchaudio-2.10.0%2Brocm7.1-cp312-cp312-manylinux_2_28_x86_64.whl#sha256=a54b8c1f61de01b1ab946589aa015821dd11093544702249d20aba56913c68bb";
-        hash = "sha256-pUuMH2HeAbGrlGWJqgFYId0RCTVEcCJJ0gq6VpE8aLs=";
+        version = "2.9.0-rocm7.2";
+        url = "https://repo.radeon.com/rocm/manylinux/rocm-rel-7.2/torchaudio-2.9.0%2Brocm7.2.0.gite3c6ee2b-cp312-cp312-linux_x86_64.whl";
+        hash = "sha256-z3j9d3TKYYclSmMFHQfEarH0u9WkfmS403LTxY5Sl5o=";
       };
+      # torch = {
+      #   version = "2.10.0";
+      #   url = "https://download.pytorch.org/whl/rocm7.1/torch-2.10.0%2Brocm7.1-cp312-cp312-manylinux_2_28_x86_64.whl#sha256=008ee0d77bb8b5f9f4ee1f00212019c4619171e3c4195de56f253331b3bc320d";
+      #   hash = "sha256-AI7g13u4tfn07h8AISAZxGGRcePEGV3lbyUzMbO8Mg0=";
+      # };
+      # torchvision = {
+      #   version = "0.25.0";
+      #   url = "https://download.pytorch.org/whl/rocm7.1/torchvision-0.25.0%2Brocm7.1-cp312-cp312-manylinux_2_28_x86_64.whl#sha256=8aea3ddbdb74801d3374577a10b3f04d49897c27add235cb25313df6e65b1929";
+      #   hash = "sha256-iuo929t0gB0zdFd6ELPwTUmJfCet0jXLJTE99uZbGSk=";
+      # };
+      # torchaudio = {
+      #   version = "2.10.0";
+      #   url = "https://download.pytorch.org/whl/rocm7.1/torchaudio-2.10.0%2Brocm7.1-cp312-cp312-manylinux_2_28_x86_64.whl#sha256=a54b8c1f61de01b1ab946589aa015821dd11093544702249d20aba56913c68bb";
+      #   hash = "sha256-pUuMH2HeAbGrlGWJqgFYId0RCTVEcCJJ0gq6VpE8aLs=";
+      # };
     };
   };
 
